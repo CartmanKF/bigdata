@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Haritada Deprem Sorgulama</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
+    <style>
+        #map { height: 90vh; width: 100%; }
+        #formPopup {
+            position: fixed;
+            top: 10%;
+            left: 30%;
+            width: 40%;
+            background: white;
+            padding: 20px;
+            border: 2px solid black;
+            z-index: 1000;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h3>Haritada bir noktaya tıklayın</h3>
+    <div id="map"></div>
+
+    <div id="formPopup">
+        <form action="/filtered_map" method="get">
+            <input type="hidden" name="lat" id="lat">
+            <input type="hidden" name="lon" id="lon">
+
+            <label>Başlangıç Tarihi:</label><br>
+            <input type="date" name="start_date" required><br><br>
+            <label>Bitiş Tarihi:</label><br>
+            <input type="date" name="end_date" required><br><br>
+            <label>Çap (km):</label><br>
+            <input type="number" name="radius" value="100" required><br><br>
+            <button type="submit">Depremleri Göster</button>
+        </form>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
+    <script>
+        var map = L.map('map').setView([38.5, 35], 6);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
+
+        var marker;
+
+        map.on('click', function (e) {
+            if (marker) {
+                map.removeLayer(marker);
+            }
+            marker = L.marker(e.latlng).addTo(map);
+
+            document.getElementById("lat").value = e.latlng.lat;
+            document.getElementById("lon").value = e.latlng.lng;
+            document.getElementById("formPopup").style.display = "block";
+        });
+    </script>
+
+    <!-- Toast Popup ve script -->
+    <div id="eqToast" style="
+        display:none;
+        position:fixed;
+        top:24px;
+        right:24px;
+        background:#222;
+        color:white;
+        padding:16px 28px;
+        border-radius:14px;
+        box-shadow:0 2px 12px rgba(0,0,0,0.18);
+        z-index:9999;
+        font-size:18px;
+        min-width:260px;
+        max-width:340px;">
+        <span id="toastMsg"></span>
+        <span id="toastClose" onclick="closeToast()" style="
+            position:absolute;top:6px;right:12px;cursor:pointer;font-size:24px;">&times;</span>
+    </div>
+    <script>
+    let lastEventId = null;
+    let toastTimeout = null;
+    function showToast(msg) {
+        var toast = document.getElementById("eqToast");
+        document.getElementById("toastMsg").innerHTML = msg;
+        toast.style.display = "block";
+        if (toastTimeout) clearTimeout(toastTimeout);
+        toastTimeout = setTimeout(() => { toast.style.display = "none"; }, 8000);
+    }
+    function closeToast() {
+        var toast = document.getElementById("eqToast");
+        toast.style.display = "none";
+        if (toastTimeout) clearTimeout(toastTimeout);
+    }
+    function checkNewQuake() {
+        fetch('/last_realtime_eq')
+            .then(resp => resp.json())
+            .then(data => {
+                if(data && data.EventID && data.EventID !== lastEventId){
+                    lastEventId = data.EventID;
+                    let txt = `<b>Yeni Deprem:</b><br>
+                            <b>${data.Location || ""}</b><br>
+                            ${data.Date}<br>
+                            <b>M ${data.Magnitude}</b>`;
+                    showToast(txt);
+                }
+            });
+    }
+    checkNewQuake();
+    setInterval(checkNewQuake, 8000);
+    </script>
+</body>
+</html>
