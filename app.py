@@ -1,14 +1,19 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, session
 from pymongo import MongoClient
 import folium
 from datetime import datetime, timedelta
 from geopy.distance import geodesic
+from folium.features import DivIcon
 import threading
 import time
 import requests
 import pytz
+import base64
+import twitter_api
+
 
 app = Flask(__name__)
+app.secret_key = "super-secret-key"  # Session için gerekli
 
 client = MongoClient("mongodb+srv://cartmankf:H3Ppd2xIyGDMAVoO@cluster0.gyh12d4.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0")
 db = client["earthquake_db"]
@@ -22,13 +27,13 @@ def fetch_afad_loop():
     while True:
         with fetch_lock:
             now_tr = datetime.now(TURKEY)
-            one_hour_ago_tr = now_tr - timedelta(hours=1)
+            two_hours_ago_tr = now_tr - timedelta(hours=2)
             now_utc = now_tr.astimezone(pytz.utc)
-            one_hour_ago_utc = one_hour_ago_tr.astimezone(pytz.utc)
-            start = one_hour_ago_utc.strftime('%Y-%m-%dT%H:%M:%S')
+            two_hours_ago_utc = two_hours_ago_tr.astimezone(pytz.utc)
+            start = two_hours_ago_utc.strftime('%Y-%m-%dT%H:%M:%S')  # Buradaki isim düzeltildi
             end = now_utc.strftime('%Y-%m-%dT%H:%M:%S')
             url = f"https://servisnet.afad.gov.tr/apigateway/deprem/apiv2/event/filter?start={start}&end={end}"
-            print(f"[FETCH] Son 1 saatlik: {url}")
+            print(f"[FETCH] Son 2 saatlik: {url}")
 
             try:
                 response = requests.get(url, timeout=15)
@@ -81,9 +86,37 @@ def fetch_afad_loop():
                 print(f"✅ {eklenen} yeni deprem eklendi [{datetime.now(TURKEY)}]")
         time.sleep(10)
 
+
+
+def get_location_from_ip(ip):
+    try:
+        url = f"http://ip-api.com/json/{ip}?fields=status,message,lat,lon"
+        resp = requests.get(url, timeout=5)
+        data = resp.json()
+        if data.get("status") == "success":
+            return data.get("lat"), data.get("lon")
+        else:
+            print(f"IP konum hatası: {data.get('message')}")
+    except Exception as e:
+        print(f"IP konum alma hatası: {e}")
+    return None, None
+
+def parse_date_to_utc(date_obj):
+    if isinstance(date_obj, str):
+        try:
+            date_obj = datetime.strptime(date_obj, "%Y-%m-%d %H:%M:%S")
+            date_obj = pytz.utc.localize(date_obj)
+        except:
+            date_obj = datetime.fromisoformat(date_obj)
+            if date_obj.tzinfo is None:
+                date_obj = pytz.utc.localize(date_obj)
+    elif date_obj.tzinfo is None:
+        date_obj = pytz.utc.localize(date_obj)
+    return date_obj
+
+
 @app.route('/')
 def index():
-    # Türkiye'nin merkezi için otomatik harita
     turkey_center = (39.0, 35.0)
     now_utc = datetime.now(pytz.utc)
     one_week_ago_utc = now_utc - timedelta(days=7)
@@ -96,18 +129,8 @@ def index():
         try:
             qlat = float(str(quake["Latitude"]).replace(",", "."))
             qlon = float(str(quake["Longitude"]).replace(",", "."))
-            date_utc = quake['Date']
-            # Her durumda timezone-aware yap
-            if isinstance(date_utc, str):
-                try:
-                    date_utc = datetime.strptime(date_utc, "%Y-%m-%d %H:%M:%S")
-                    date_utc = pytz.utc.localize(date_utc)
-                except:
-                    date_utc = datetime.fromisoformat(date_utc)
-                    if date_utc.tzinfo is None:
-                        date_utc = pytz.utc.localize(date_utc)
-            elif date_utc.tzinfo is None:
-                date_utc = pytz.utc.localize(date_utc)
+            date_utc = parse_date_to_utc(quake['Date'])
+
             date_tr = date_utc.astimezone(turkey)
             tarih_str = date_tr.strftime("%Y-%m-%d %H:%M:%S")
             popup = f"{tarih_str}<br>{quake['Location']}<br>M {quake['Magnitude']}"
@@ -140,17 +163,17 @@ def filtered_map():
         lon = float(request.args.get("lon").replace(",", "."))
         radius = float(request.args.get("radius", "100"))
 
-        # Türkiye saatine göre tarih aralığı al
+        turkey = TURKEY
+
         start_dt_tr = datetime.strptime(start_date, "%Y-%m-%d")
         end_dt_tr = datetime.strptime(end_date, "%Y-%m-%d") + timedelta(days=1) - timedelta(seconds=1)
-        turkey = TURKEY
-        # UTC'ye çevir
+
         start_dt_tr = turkey.localize(start_dt_tr)
         end_dt_tr = turkey.localize(end_dt_tr)
+
         start_dt_utc = start_dt_tr.astimezone(pytz.utc)
         end_dt_utc = end_dt_tr.astimezone(pytz.utc)
 
-        # UTC'ye göre veritabanı sorgusu
         results = list(collection.find({
             "Date": {"$gte": start_dt_utc, "$lte": end_dt_utc}
         }, {"_id": 0}))
@@ -158,47 +181,82 @@ def filtered_map():
             "Date": {"$gte": start_dt_utc, "$lte": end_dt_utc}
         }, {"_id": 0}))
 
-        # Son 1 saat için UTC'ye göre aralık
         now_tr = datetime.now(turkey)
-        one_hour_ago_tr = now_tr - timedelta(hours=1)
+        two_hours_ago_tr = now_tr - timedelta(hours=2)
         now_utc = now_tr.astimezone(pytz.utc)
-        one_hour_ago_utc = one_hour_ago_tr.astimezone(pytz.utc)
+        two_hours_ago_utc = two_hours_ago_tr.astimezone(pytz.utc)
 
         m = folium.Map(location=[lat, lon], zoom_start=7)
+
+        pulse_css = """
+        <style>
+        .pulse {
+          width: 20px;
+          height: 20px;
+          background: rgba(255, 0, 0, 0.5);
+          border-radius: 50%;
+          position: relative;
+          animation: pulse-animation 2s infinite;
+          border: 2px solid rgba(255, 0, 0, 0.8);
+          box-sizing: content-box;
+        }
+        @keyframes pulse-animation {
+          0% {
+            transform: scale(0.7);
+            opacity: 1;
+          }
+          70% {
+            transform: scale(2.5);
+            opacity: 0;
+          }
+          100% {
+            transform: scale(0.7);
+            opacity: 0;
+          }
+        }
+        </style>
+        """
+        m.get_root().header.add_child(folium.Element(pulse_css))
+
         for quake in results:
             try:
                 qlat = float(str(quake["Latitude"]).replace(",", "."))
                 qlon = float(str(quake["Longitude"]).replace(",", "."))
-                date_utc = quake['Date']
-                # Her durumda timezone-aware yap
-                if isinstance(date_utc, str):
-                    try:
-                        date_utc = datetime.strptime(date_utc, "%Y-%m-%d %H:%M:%S")
-                        date_utc = pytz.utc.localize(date_utc)
-                    except:
-                        date_utc = datetime.fromisoformat(date_utc)
-                        if date_utc.tzinfo is None:
-                            date_utc = pytz.utc.localize(date_utc)
-                elif date_utc.tzinfo is None:
-                    date_utc = pytz.utc.localize(date_utc)
-                date_tr = date_utc.astimezone(TURKEY)
+                date_utc = parse_date_to_utc(quake['Date'])
+
+                date_tr = date_utc.astimezone(turkey)
                 tarih_str = date_tr.strftime("%Y-%m-%d %H:%M:%S")
-                color = "blue"
-                if one_hour_ago_utc <= date_utc <= now_utc:
-                    color = "red"
+
                 distance = geodesic((lat, lon), (qlat, qlon)).km
-                if distance <= radius:
+
+                color = "blue"
+                if two_hours_ago_utc <= date_utc <= now_utc:
+                    color = "red"
+                elif distance <= radius:
                     color = "purple"
+
                 popup = f"{tarih_str}<br>{quake['Location']}<br>M {quake['Magnitude']}"
-                folium.CircleMarker(
-                    location=[qlat, qlon],
-                    radius=7 if color != "blue" else 5,
-                    color=color,
-                    fill=True,
-                    fill_color=color,
-                    fill_opacity=0.8,
-                    popup=popup
-                ).add_to(m)
+
+                if color == "red":
+                    folium.Marker(
+                        location=[qlat, qlon],
+                        popup=popup,
+                        icon=DivIcon(
+                            icon_size=(20, 20),
+                            icon_anchor=(10, 10),
+                            html='<div class="pulse"></div>'
+                        )
+                    ).add_to(m)
+                else:
+                    folium.CircleMarker(
+                        location=[qlat, qlon],
+                        radius=7 if color != "blue" else 5,
+                        color=color,
+                        fill=True,
+                        fill_color=color,
+                        fill_opacity=0.8,
+                        popup=popup
+                    ).add_to(m)
             except Exception as e:
                 print("Harita hatası:", e)
                 continue
@@ -219,17 +277,7 @@ def filtered_map():
 def last_realtime_eq():
     last_eq = rt_collection.find_one(sort=[("Date", -1)])
     if last_eq:
-        date_utc = last_eq["Date"]
-        if isinstance(date_utc, str):
-            try:
-                date_utc = datetime.strptime(date_utc, "%Y-%m-%d %H:%M:%S")
-                date_utc = pytz.utc.localize(date_utc)
-            except:
-                date_utc = datetime.fromisoformat(date_utc)
-                if date_utc.tzinfo is None:
-                    date_utc = pytz.utc.localize(date_utc)
-        elif date_utc.tzinfo is None:
-            date_utc = pytz.utc.localize(date_utc)
+        date_utc = parse_date_to_utc(quake['Date'])
         date_tr = date_utc.astimezone(TURKEY)
         last_eq["Date"] = date_tr.strftime("%Y-%m-%d %H:%M:%S")
         last_eq["_id"] = str(last_eq["_id"])
@@ -238,14 +286,100 @@ def last_realtime_eq():
 
 @app.route('/last50')
 def last50():
-    # Son 50 depremi hem realtime'dan hem historical'dan çek, tarihe göre sırala
+    lat = request.args.get('lat', type=float)
+    lon = request.args.get('lon', type=float)
+
+    if lat is None or lon is None:
+        if request.environ.get('HTTP_X_FORWARDED_FOR'):
+            ip = request.environ['HTTP_X_FORWARDED_FOR'].split(',')[0]
+        else:
+            ip = request.remote_addr
+
+        if ip in ('127.0.0.1', '::1'):
+            lat, lon = 41.0082, 28.9784  # İstanbul koordinatları
+        else:
+            lat, lon = get_location_from_ip(ip)
+
+    session['user_lat'] = lat
+    session['user_lon'] = lon
+
+    max_distance_km = 100
+
     all_eq = list(collection.find({}, {"_id": 0})) + list(rt_collection.find({}, {"_id": 0}))
     all_eq.sort(key=lambda x: x.get("Date"), reverse=True)
     last50 = all_eq[:50]
-    return render_template("last50.html", earthquakes=last50)
+
+    near_eq_count = 0
+    for eq in last50:
+        eq_lat = float(str(eq.get("Latitude", 0)).replace(",", "."))
+        eq_lon = float(str(eq.get("Longitude", 0)).replace(",", "."))
+        if lat is not None and lon is not None:
+            dist = geodesic((lat, lon), (eq_lat, eq_lon)).km
+            eq['near_user'] = dist <= max_distance_km
+            if eq['near_user']:
+                near_eq_count += 1
+        else:
+            eq['near_user'] = False
+
+    return render_template("last50.html", earthquakes=last50, near_eq_count=near_eq_count, user_location=(lat, lon))
+
+@app.route("/tweets")
+def tweets():
+    hashtag = request.args.get("hashtag")
+    if not hashtag:
+        return jsonify({"error": "Hashtag parametresi gerekli"}), 400
+    token = twitter_api.get_bearer_token()
+    tweets = twitter_api.search_tweets(token, hashtag)
+    
+    # Tweetleri MongoDB'ye kaydet
+    twitter_api.save_tweets_to_db(tweets)
+
+    return jsonify(tweets)
+
+def tweetleri_periyodik_kaydet():
+    while True:
+        try:
+            token = twitter_api.get_bearer_token()
+            tweets = twitter_api.search_tweets(token, "deprem" , "türkiye" , "ankara", "istanbul","izmir")
+            twitter_api.save_tweets_to_db(tweets)
+            print("Tweetler kaydedildi.")
+        except Exception as e:
+            print(f"Hata: {e}")
+        time.sleep(120)  
+
+
+
+@app.route('/nearby_notifications')
+def nearby_notifications():
+    lat = session.get('user_lat')
+    lon = session.get('user_lon')
+    if lat is None or lon is None:
+        return jsonify([])
+
+    now_utc = datetime.now(pytz.utc)
+    one_minute_ago = now_utc - timedelta(minutes=1)
+
+    recent_eq = list(rt_collection.find({
+        "Date": {"$gte": one_minute_ago}
+    }, {"_id": 0}))
+
+    nearby_eq = []
+    for eq in recent_eq:
+        eq_lat = float(str(eq.get("Latitude", 0)).replace(",", "."))
+        eq_lon = float(str(eq.get("Longitude", 0)).replace(",", "."))
+        dist = geodesic((lat, lon), (eq_lat, eq_lon)).km
+        if dist <= 100:
+            nearby_eq.append({
+                "location": eq.get("Location"),
+                "magnitude": eq.get("Magnitude"),
+                "date": eq.get("Date").strftime("%Y-%m-%d %H:%M:%S"),
+                "distance_km": round(dist, 2)
+            })
+    return jsonify(nearby_eq)
 
 if __name__ == "__main__":
     fetch_thread = threading.Thread(target=fetch_afad_loop, daemon=True)
     fetch_thread.start()
     print("✅ Flask başlatıldı: http://127.0.0.1:5000")
+    threading.Thread(target=tweetleri_periyodik_kaydet, daemon=True).start()
     app.run(debug=True)

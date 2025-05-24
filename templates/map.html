@@ -3,6 +3,34 @@
 <head>
     
     <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    
+        <style>
+        .pulse {
+          width: 20px;
+          height: 20px;
+          background: rgba(255, 0, 0, 0.5);
+          border-radius: 50%;
+          position: relative;
+          animation: pulse-animation 2s infinite;
+          border: 2px solid rgba(255, 0, 0, 0.8);
+          box-sizing: content-box;
+        }
+        @keyframes pulse-animation {
+          0% {
+            transform: scale(0.7);
+            opacity: 1;
+          }
+          70% {
+            transform: scale(2.5);
+            opacity: 0;
+          }
+          100% {
+            transform: scale(0.7);
+            opacity: 0;
+          }
+        }
+        </style>
+        
     <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.js"></script>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"></script>
@@ -17,7 +45,7 @@
             <meta name="viewport" content="width=device-width,
                 initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
             <style>
-                #map_b743af90482398c4292c86fa47b05fc3 {
+                #map_8236b8db11b0fc85567f8eba63f84566 {
                     position: relative;
                     width: 100.0%;
                     height: 100.0%;
@@ -54,16 +82,16 @@
 <body>
     
     
-            <div class="folium-map" id="map_b743af90482398c4292c86fa47b05fc3" ></div>
+            <div class="folium-map" id="map_8236b8db11b0fc85567f8eba63f84566" ></div>
         
 </body>
 <script>
     
     
-            var map_b743af90482398c4292c86fa47b05fc3 = L.map(
-                "map_b743af90482398c4292c86fa47b05fc3",
+            var map_8236b8db11b0fc85567f8eba63f84566 = L.map(
+                "map_8236b8db11b0fc85567f8eba63f84566",
                 {
-                    center: [39.967042, 32.8593645],
+                    center: [39.960576, 32.60416],
                     crs: L.CRS.EPSG3857,
                     ...{
   "zoom": 7,
@@ -78,7 +106,7 @@
 
         
     
-            var tile_layer_90e64e433dad609784e0a369aa9c26ae = L.tileLayer(
+            var tile_layer_20b64ceeea2e9c7fb00cd3bf1787f780 = L.tileLayer(
                 "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
                 {
   "minZoom": 0,
@@ -95,385 +123,780 @@
             );
         
     
-            tile_layer_90e64e433dad609784e0a369aa9c26ae.addTo(map_b743af90482398c4292c86fa47b05fc3);
+            tile_layer_20b64ceeea2e9c7fb00cd3bf1787f780.addTo(map_8236b8db11b0fc85567f8eba63f84566);
         
     
-            var circle_marker_43b4b536e12e5170a104541358208f36 = L.circleMarker(
+            var circle_marker_cef3b3a6ce9ab79f91b3f2646073d194 = L.circleMarker(
                 [41.0, 34.40083],
                 {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "blue", "fillOpacity": 0.8, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 3}
-            ).addTo(map_b743af90482398c4292c86fa47b05fc3);
+            ).addTo(map_8236b8db11b0fc85567f8eba63f84566);
         
     
-        var popup_c4278a90210d7ae93c30f0a983796e6f = L.popup({
+        var popup_6f00f35d3e69efe74d642eed31ece67d = L.popup({
   "maxWidth": "100%",
 });
 
         
             
-                var html_027b1dd988d10be97f881f8b3c5b5a73 = $(`<div id="html_027b1dd988d10be97f881f8b3c5b5a73" style="width: 100.0%; height: 100.0%;">2025-05-24 14:45:23<br>Kargı (Çorum)<br>M 1.9</div>`)[0];
-                popup_c4278a90210d7ae93c30f0a983796e6f.setContent(html_027b1dd988d10be97f881f8b3c5b5a73);
+                var html_1043476b1a385446f519e24fa3e12a8b = $(`<div id="html_1043476b1a385446f519e24fa3e12a8b" style="width: 100.0%; height: 100.0%;">2025-05-24 14:45:23<br>Kargı (Çorum)<br>M 1.9</div>`)[0];
+                popup_6f00f35d3e69efe74d642eed31ece67d.setContent(html_1043476b1a385446f519e24fa3e12a8b);
             
         
 
-        circle_marker_43b4b536e12e5170a104541358208f36.bindPopup(popup_c4278a90210d7ae93c30f0a983796e6f)
+        circle_marker_cef3b3a6ce9ab79f91b3f2646073d194.bindPopup(popup_6f00f35d3e69efe74d642eed31ece67d)
         ;
 
         
     
     
-            var circle_marker_7550a3ac2d8a57363aa69f7148a72f68 = L.circleMarker(
+            var circle_marker_d8950c3a3419e1c213b382e10036ecb4 = L.circleMarker(
                 [38.61444, 26.71972],
                 {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "blue", "fillOpacity": 0.8, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 3}
-            ).addTo(map_b743af90482398c4292c86fa47b05fc3);
+            ).addTo(map_8236b8db11b0fc85567f8eba63f84566);
         
     
-        var popup_cffdbd24b764a23aa2a3075e74874642 = L.popup({
+        var popup_31af9ad1c2dbe70cd12bde595e52c0f3 = L.popup({
   "maxWidth": "100%",
 });
 
         
             
-                var html_0d612b59ff412ba89f110265dfae1095 = $(`<div id="html_0d612b59ff412ba89f110265dfae1095" style="width: 100.0%; height: 100.0%;">2025-05-24 15:04:28<br>Ege Denizi - İzmir Körfezi - [05.79 km] Foça (İzmir)<br>M 1.3</div>`)[0];
-                popup_cffdbd24b764a23aa2a3075e74874642.setContent(html_0d612b59ff412ba89f110265dfae1095);
+                var html_7411c588295383c296e24a263d867451 = $(`<div id="html_7411c588295383c296e24a263d867451" style="width: 100.0%; height: 100.0%;">2025-05-24 15:04:28<br>Ege Denizi - İzmir Körfezi - [05.79 km] Foça (İzmir)<br>M 1.3</div>`)[0];
+                popup_31af9ad1c2dbe70cd12bde595e52c0f3.setContent(html_7411c588295383c296e24a263d867451);
             
         
 
-        circle_marker_7550a3ac2d8a57363aa69f7148a72f68.bindPopup(popup_cffdbd24b764a23aa2a3075e74874642)
+        circle_marker_d8950c3a3419e1c213b382e10036ecb4.bindPopup(popup_31af9ad1c2dbe70cd12bde595e52c0f3)
         ;
 
         
     
     
-            var circle_marker_d8bd7cab32e0ea0c15541677a5e7f06c = L.circleMarker(
+            var circle_marker_072a5b4a19f0c9e33f4d7b63e49495da = L.circleMarker(
                 [40.61417, 41.37722],
                 {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "blue", "fillOpacity": 0.8, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 3}
-            ).addTo(map_b743af90482398c4292c86fa47b05fc3);
+            ).addTo(map_8236b8db11b0fc85567f8eba63f84566);
         
     
-        var popup_8f77331f2fe77d370b1c09aa84e214c9 = L.popup({
+        var popup_61a3daf1f61c63c377bb304c8a8f1780 = L.popup({
   "maxWidth": "100%",
 });
 
         
             
-                var html_7a917664fed4e8aaefe3b31ad8f70a95 = $(`<div id="html_7a917664fed4e8aaefe3b31ad8f70a95" style="width: 100.0%; height: 100.0%;">2025-05-24 15:13:57<br>Yusufeli (Artvin)<br>M 1.6</div>`)[0];
-                popup_8f77331f2fe77d370b1c09aa84e214c9.setContent(html_7a917664fed4e8aaefe3b31ad8f70a95);
+                var html_db62d7ab3514a6ee7e86349ef7fcb1ac = $(`<div id="html_db62d7ab3514a6ee7e86349ef7fcb1ac" style="width: 100.0%; height: 100.0%;">2025-05-24 15:13:57<br>Yusufeli (Artvin)<br>M 1.6</div>`)[0];
+                popup_61a3daf1f61c63c377bb304c8a8f1780.setContent(html_db62d7ab3514a6ee7e86349ef7fcb1ac);
             
         
 
-        circle_marker_d8bd7cab32e0ea0c15541677a5e7f06c.bindPopup(popup_8f77331f2fe77d370b1c09aa84e214c9)
+        circle_marker_072a5b4a19f0c9e33f4d7b63e49495da.bindPopup(popup_61a3daf1f61c63c377bb304c8a8f1780)
         ;
 
         
     
     
-            var circle_marker_e109abb9058d361d6a2e6d12ed5b5c4c = L.circleMarker(
+            var circle_marker_eaba37a3a0c6ec891b447d0d716d5699 = L.circleMarker(
                 [38.3075, 38.1125],
                 {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "blue", "fillOpacity": 0.8, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 3}
-            ).addTo(map_b743af90482398c4292c86fa47b05fc3);
+            ).addTo(map_8236b8db11b0fc85567f8eba63f84566);
         
     
-        var popup_4dab92302184819895a71458ecbd032d = L.popup({
+        var popup_1e523c63635167617ef98d0f360aa211 = L.popup({
   "maxWidth": "100%",
 });
 
         
             
-                var html_df23f567524a554064f6fe7fa19df419 = $(`<div id="html_df23f567524a554064f6fe7fa19df419" style="width: 100.0%; height: 100.0%;">2025-05-24 16:34:41<br>Yeşilyurt (Malatya)<br>M 1.6</div>`)[0];
-                popup_4dab92302184819895a71458ecbd032d.setContent(html_df23f567524a554064f6fe7fa19df419);
+                var html_47848a90cfe4ef58a19734e41649784e = $(`<div id="html_47848a90cfe4ef58a19734e41649784e" style="width: 100.0%; height: 100.0%;">2025-05-24 16:34:41<br>Yeşilyurt (Malatya)<br>M 1.6</div>`)[0];
+                popup_1e523c63635167617ef98d0f360aa211.setContent(html_47848a90cfe4ef58a19734e41649784e);
             
         
 
-        circle_marker_e109abb9058d361d6a2e6d12ed5b5c4c.bindPopup(popup_4dab92302184819895a71458ecbd032d)
+        circle_marker_eaba37a3a0c6ec891b447d0d716d5699.bindPopup(popup_1e523c63635167617ef98d0f360aa211)
         ;
 
         
     
     
-            var circle_marker_569d7c2261ec055ff90dc1005f63d9e5 = L.circleMarker(
+            var circle_marker_38a35d7f32ec14afb5bd15ddd77d9a4e = L.circleMarker(
                 [36.50306, 28.15861],
                 {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "blue", "fillOpacity": 0.8, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 3}
-            ).addTo(map_b743af90482398c4292c86fa47b05fc3);
+            ).addTo(map_8236b8db11b0fc85567f8eba63f84566);
         
     
-        var popup_4e42cf73b601c610281a662cc0ef1035 = L.popup({
+        var popup_35d43550722069bf35411947d9671d87 = L.popup({
   "maxWidth": "100%",
 });
 
         
             
-                var html_aee51413618c29c218969d9950c56a7b = $(`<div id="html_aee51413618c29c218969d9950c56a7b" style="width: 100.0%; height: 100.0%;">2025-05-24 17:23:36<br>Akdeniz - [14.97 km] Marmaris (Muğla)<br>M 1.1</div>`)[0];
-                popup_4e42cf73b601c610281a662cc0ef1035.setContent(html_aee51413618c29c218969d9950c56a7b);
+                var html_1db93cee4711e4b80480dbe4ac567e02 = $(`<div id="html_1db93cee4711e4b80480dbe4ac567e02" style="width: 100.0%; height: 100.0%;">2025-05-24 17:23:36<br>Akdeniz - [14.97 km] Marmaris (Muğla)<br>M 1.1</div>`)[0];
+                popup_35d43550722069bf35411947d9671d87.setContent(html_1db93cee4711e4b80480dbe4ac567e02);
             
         
 
-        circle_marker_569d7c2261ec055ff90dc1005f63d9e5.bindPopup(popup_4e42cf73b601c610281a662cc0ef1035)
+        circle_marker_38a35d7f32ec14afb5bd15ddd77d9a4e.bindPopup(popup_35d43550722069bf35411947d9671d87)
         ;
 
         
     
     
-            var circle_marker_30352a678e3d55eb48ff8b80bfe72e58 = L.circleMarker(
+            var circle_marker_51bdcfff50db9cb9da41fb2a5e786763 = L.circleMarker(
                 [36.94306, 27.99806],
                 {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "blue", "fillOpacity": 0.8, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 3}
-            ).addTo(map_b743af90482398c4292c86fa47b05fc3);
+            ).addTo(map_8236b8db11b0fc85567f8eba63f84566);
         
     
-        var popup_658249225eddc44e4dc47a4dea2f934b = L.popup({
+        var popup_727bb77f005d9ca23ed5c59eb9b22db2 = L.popup({
   "maxWidth": "100%",
 });
 
         
             
-                var html_4cc3ca75facfff0c42c3e0aa1f8e2fd6 = $(`<div id="html_4cc3ca75facfff0c42c3e0aa1f8e2fd6" style="width: 100.0%; height: 100.0%;">2025-05-24 17:41:56<br>Ege Denizi - Gökova Körfezi - [10.59 km] Milas (Muğla)<br>M 1.1</div>`)[0];
-                popup_658249225eddc44e4dc47a4dea2f934b.setContent(html_4cc3ca75facfff0c42c3e0aa1f8e2fd6);
+                var html_9141bbace156127a7e531679ecee87ce = $(`<div id="html_9141bbace156127a7e531679ecee87ce" style="width: 100.0%; height: 100.0%;">2025-05-24 17:41:56<br>Ege Denizi - Gökova Körfezi - [10.59 km] Milas (Muğla)<br>M 1.1</div>`)[0];
+                popup_727bb77f005d9ca23ed5c59eb9b22db2.setContent(html_9141bbace156127a7e531679ecee87ce);
             
         
 
-        circle_marker_30352a678e3d55eb48ff8b80bfe72e58.bindPopup(popup_658249225eddc44e4dc47a4dea2f934b)
+        circle_marker_51bdcfff50db9cb9da41fb2a5e786763.bindPopup(popup_727bb77f005d9ca23ed5c59eb9b22db2)
         ;
 
         
     
     
-            var circle_marker_a0ef02c88d38d0515a711c3491a07d3e = L.circleMarker(
+            var circle_marker_6570772a320677c0a6963fde7cfccb67 = L.circleMarker(
                 [37.5375, 36.90278],
                 {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "blue", "fillOpacity": 0.8, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 3}
-            ).addTo(map_b743af90482398c4292c86fa47b05fc3);
+            ).addTo(map_8236b8db11b0fc85567f8eba63f84566);
         
     
-        var popup_bfe3a345dd2427956a26adc0bed7607d = L.popup({
+        var popup_25e704e98fabe982c921a4a816d33dbf = L.popup({
   "maxWidth": "100%",
 });
 
         
             
-                var html_683c5be08ffd9c39e2a8cf540dc5002d = $(`<div id="html_683c5be08ffd9c39e2a8cf540dc5002d" style="width: 100.0%; height: 100.0%;">2025-05-24 18:56:46<br>Onikişubat (Kahramanmaraş)<br>M 1.6</div>`)[0];
-                popup_bfe3a345dd2427956a26adc0bed7607d.setContent(html_683c5be08ffd9c39e2a8cf540dc5002d);
+                var html_e76ecf057550de147890e2b2ea2307e8 = $(`<div id="html_e76ecf057550de147890e2b2ea2307e8" style="width: 100.0%; height: 100.0%;">2025-05-24 18:56:46<br>Onikişubat (Kahramanmaraş)<br>M 1.6</div>`)[0];
+                popup_25e704e98fabe982c921a4a816d33dbf.setContent(html_e76ecf057550de147890e2b2ea2307e8);
             
         
 
-        circle_marker_a0ef02c88d38d0515a711c3491a07d3e.bindPopup(popup_bfe3a345dd2427956a26adc0bed7607d)
+        circle_marker_6570772a320677c0a6963fde7cfccb67.bindPopup(popup_25e704e98fabe982c921a4a816d33dbf)
         ;
 
         
     
     
-            var circle_marker_abc3b8b0b8eb8f9f206f28327c60d3c3 = L.circleMarker(
+            var circle_marker_68d1cd8223c313db4483491f3b377541 = L.circleMarker(
                 [37.5375, 36.90278],
                 {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "blue", "fillOpacity": 0.8, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 3}
-            ).addTo(map_b743af90482398c4292c86fa47b05fc3);
+            ).addTo(map_8236b8db11b0fc85567f8eba63f84566);
         
     
-        var popup_1133981f8a0849dd2c9dc1145ee1a32f = L.popup({
+        var popup_9168ed2cbc39180a67b69ee82bd7dbf1 = L.popup({
   "maxWidth": "100%",
 });
 
         
             
-                var html_5bb9c6e405a59729db472a92aca37f2a = $(`<div id="html_5bb9c6e405a59729db472a92aca37f2a" style="width: 100.0%; height: 100.0%;">2025-05-24 18:56:46<br>Onikişubat (Kahramanmaraş)<br>M 1.6</div>`)[0];
-                popup_1133981f8a0849dd2c9dc1145ee1a32f.setContent(html_5bb9c6e405a59729db472a92aca37f2a);
+                var html_9c47c17deaf6894588db0d9f365881b6 = $(`<div id="html_9c47c17deaf6894588db0d9f365881b6" style="width: 100.0%; height: 100.0%;">2025-05-24 18:56:46<br>Onikişubat (Kahramanmaraş)<br>M 1.6</div>`)[0];
+                popup_9168ed2cbc39180a67b69ee82bd7dbf1.setContent(html_9c47c17deaf6894588db0d9f365881b6);
             
         
 
-        circle_marker_abc3b8b0b8eb8f9f206f28327c60d3c3.bindPopup(popup_1133981f8a0849dd2c9dc1145ee1a32f)
+        circle_marker_68d1cd8223c313db4483491f3b377541.bindPopup(popup_9168ed2cbc39180a67b69ee82bd7dbf1)
         ;
 
         
     
     
-            var circle_marker_c8612b449793efb26f8ee1b83124f792 = L.circleMarker(
+            var circle_marker_2f05c9620b8366cda8155cec9a39e5b0 = L.circleMarker(
                 [39.18778, 28.93778],
                 {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "blue", "fillOpacity": 0.8, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 3}
-            ).addTo(map_b743af90482398c4292c86fa47b05fc3);
+            ).addTo(map_8236b8db11b0fc85567f8eba63f84566);
         
     
-        var popup_df3f03b9b54aa894bc62401e490f0b22 = L.popup({
+        var popup_118175b47ad8e1856970055349346f49 = L.popup({
   "maxWidth": "100%",
 });
 
         
             
-                var html_6f56fe1f1357b83cd9681cc403210766 = $(`<div id="html_6f56fe1f1357b83cd9681cc403210766" style="width: 100.0%; height: 100.0%;">2025-05-24 18:19:17<br>Simav (Kütahya)<br>M 1.3</div>`)[0];
-                popup_df3f03b9b54aa894bc62401e490f0b22.setContent(html_6f56fe1f1357b83cd9681cc403210766);
+                var html_95d2bdf20ed3bad2b6716d0cf54e3408 = $(`<div id="html_95d2bdf20ed3bad2b6716d0cf54e3408" style="width: 100.0%; height: 100.0%;">2025-05-24 18:19:17<br>Simav (Kütahya)<br>M 1.3</div>`)[0];
+                popup_118175b47ad8e1856970055349346f49.setContent(html_95d2bdf20ed3bad2b6716d0cf54e3408);
             
         
 
-        circle_marker_c8612b449793efb26f8ee1b83124f792.bindPopup(popup_df3f03b9b54aa894bc62401e490f0b22)
+        circle_marker_2f05c9620b8366cda8155cec9a39e5b0.bindPopup(popup_118175b47ad8e1856970055349346f49)
         ;
 
         
     
     
-            var circle_marker_689d8567a877fbc67ad527e4a9beaf4d = L.circleMarker(
+            var circle_marker_d7b1b350e25245113264706e779823b6 = L.circleMarker(
                 [37.65833, 35.97639],
                 {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "blue", "fillOpacity": 0.8, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 3}
-            ).addTo(map_b743af90482398c4292c86fa47b05fc3);
+            ).addTo(map_8236b8db11b0fc85567f8eba63f84566);
         
     
-        var popup_b84ed84df444d9ba2dae7b82888b463e = L.popup({
+        var popup_3208ea2a7a49698da99f6af5d4717ac2 = L.popup({
   "maxWidth": "100%",
 });
 
         
             
-                var html_a00177cd559b97b1d944d120b43aea50 = $(`<div id="html_a00177cd559b97b1d944d120b43aea50" style="width: 100.0%; height: 100.0%;">2025-05-24 18:22:05<br>Kozan (Adana)<br>M 2.2</div>`)[0];
-                popup_b84ed84df444d9ba2dae7b82888b463e.setContent(html_a00177cd559b97b1d944d120b43aea50);
+                var html_3c474d4c7f5327c8049b3126cd0c03f5 = $(`<div id="html_3c474d4c7f5327c8049b3126cd0c03f5" style="width: 100.0%; height: 100.0%;">2025-05-24 18:22:05<br>Kozan (Adana)<br>M 2.2</div>`)[0];
+                popup_3208ea2a7a49698da99f6af5d4717ac2.setContent(html_3c474d4c7f5327c8049b3126cd0c03f5);
             
         
 
-        circle_marker_689d8567a877fbc67ad527e4a9beaf4d.bindPopup(popup_b84ed84df444d9ba2dae7b82888b463e)
+        circle_marker_d7b1b350e25245113264706e779823b6.bindPopup(popup_3208ea2a7a49698da99f6af5d4717ac2)
         ;
 
         
     
     
-            var circle_marker_2818512f9278581204f7e6191a41c5f6 = L.circleMarker(
+            var circle_marker_c37ac796ed57492080c98973da3b0ddb = L.circleMarker(
                 [38.25556, 38.13806],
                 {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "blue", "fillOpacity": 0.8, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 3}
-            ).addTo(map_b743af90482398c4292c86fa47b05fc3);
+            ).addTo(map_8236b8db11b0fc85567f8eba63f84566);
         
     
-        var popup_7ee2f11145c235b2a9c9fac28533f323 = L.popup({
+        var popup_8401e6a6e6b684c258188892aca2d783 = L.popup({
   "maxWidth": "100%",
 });
 
         
             
-                var html_4a3f87b239bf9eac21daf74e3a2c57e4 = $(`<div id="html_4a3f87b239bf9eac21daf74e3a2c57e4" style="width: 100.0%; height: 100.0%;">2025-05-24 19:27:46<br>Yeşilyurt (Malatya)<br>M 2.0</div>`)[0];
-                popup_7ee2f11145c235b2a9c9fac28533f323.setContent(html_4a3f87b239bf9eac21daf74e3a2c57e4);
+                var html_5bb5813633d2be62abf3acf1727809fa = $(`<div id="html_5bb5813633d2be62abf3acf1727809fa" style="width: 100.0%; height: 100.0%;">2025-05-24 19:27:46<br>Yeşilyurt (Malatya)<br>M 2.0</div>`)[0];
+                popup_8401e6a6e6b684c258188892aca2d783.setContent(html_5bb5813633d2be62abf3acf1727809fa);
             
         
 
-        circle_marker_2818512f9278581204f7e6191a41c5f6.bindPopup(popup_7ee2f11145c235b2a9c9fac28533f323)
+        circle_marker_c37ac796ed57492080c98973da3b0ddb.bindPopup(popup_8401e6a6e6b684c258188892aca2d783)
         ;
 
         
     
     
-            var circle_marker_63dc0f28c82c79ae8979027fb90dbd8b = L.circleMarker(
+            var circle_marker_af5753ae47b1858e9f9a128f6a433ce5 = L.circleMarker(
                 [38.11861, 37.81917],
                 {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "blue", "fillOpacity": 0.8, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 3}
-            ).addTo(map_b743af90482398c4292c86fa47b05fc3);
+            ).addTo(map_8236b8db11b0fc85567f8eba63f84566);
         
     
-        var popup_218d174682319a4c9adaa6be60c6a877 = L.popup({
+        var popup_14dbdcb6645d1db868a27d503373909f = L.popup({
   "maxWidth": "100%",
 });
 
         
             
-                var html_5a7c3be1c4ed512f3cbab9c559db299b = $(`<div id="html_5a7c3be1c4ed512f3cbab9c559db299b" style="width: 100.0%; height: 100.0%;">2025-05-24 19:00:34<br>Doğanşehir (Malatya)<br>M 1.6</div>`)[0];
-                popup_218d174682319a4c9adaa6be60c6a877.setContent(html_5a7c3be1c4ed512f3cbab9c559db299b);
+                var html_e551c3bcf619e3a01dea4302d67bcd80 = $(`<div id="html_e551c3bcf619e3a01dea4302d67bcd80" style="width: 100.0%; height: 100.0%;">2025-05-24 19:00:34<br>Doğanşehir (Malatya)<br>M 1.6</div>`)[0];
+                popup_14dbdcb6645d1db868a27d503373909f.setContent(html_e551c3bcf619e3a01dea4302d67bcd80);
             
         
 
-        circle_marker_63dc0f28c82c79ae8979027fb90dbd8b.bindPopup(popup_218d174682319a4c9adaa6be60c6a877)
+        circle_marker_af5753ae47b1858e9f9a128f6a433ce5.bindPopup(popup_14dbdcb6645d1db868a27d503373909f)
         ;
 
         
     
     
-            var circle_marker_a187ec789fb84d3971314357949a56b7 = L.circleMarker(
+            var circle_marker_1387cd45272892c480fa721b9683fed7 = L.circleMarker(
                 [38.09056, 28.75111],
                 {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "blue", "fillOpacity": 0.8, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 3}
-            ).addTo(map_b743af90482398c4292c86fa47b05fc3);
+            ).addTo(map_8236b8db11b0fc85567f8eba63f84566);
         
     
-        var popup_80d17aa0af6493aa1ff9d1080958a5c2 = L.popup({
+        var popup_36bfc17d1f24e69b8654a514dbfe193b = L.popup({
   "maxWidth": "100%",
 });
 
         
             
-                var html_45457c43ac55d07dd882b3dff754c2c7 = $(`<div id="html_45457c43ac55d07dd882b3dff754c2c7" style="width: 100.0%; height: 100.0%;">2025-05-24 19:33:33<br>Buldan (Denizli)<br>M 1.2</div>`)[0];
-                popup_80d17aa0af6493aa1ff9d1080958a5c2.setContent(html_45457c43ac55d07dd882b3dff754c2c7);
+                var html_66c3306f74c372e0a333fc668921de50 = $(`<div id="html_66c3306f74c372e0a333fc668921de50" style="width: 100.0%; height: 100.0%;">2025-05-24 19:33:33<br>Buldan (Denizli)<br>M 1.2</div>`)[0];
+                popup_36bfc17d1f24e69b8654a514dbfe193b.setContent(html_66c3306f74c372e0a333fc668921de50);
             
         
 
-        circle_marker_a187ec789fb84d3971314357949a56b7.bindPopup(popup_80d17aa0af6493aa1ff9d1080958a5c2)
+        circle_marker_1387cd45272892c480fa721b9683fed7.bindPopup(popup_36bfc17d1f24e69b8654a514dbfe193b)
         ;
 
         
     
     
-            var circle_marker_9ad943ceb9f69ca4b4d813636595e5d4 = L.circleMarker(
+            var circle_marker_0b492c3cf16c61707db86ca27888e21c = L.circleMarker(
                 [36.73944, 35.52472],
                 {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "blue", "fillOpacity": 0.8, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 3}
-            ).addTo(map_b743af90482398c4292c86fa47b05fc3);
+            ).addTo(map_8236b8db11b0fc85567f8eba63f84566);
         
     
-        var popup_6014baf7ba114a22ea25d397fa375751 = L.popup({
+        var popup_9f5237f1578205c565812706108fbf75 = L.popup({
   "maxWidth": "100%",
 });
 
         
             
-                var html_246329a474b9c3e5cb5d26034fce8677 = $(`<div id="html_246329a474b9c3e5cb5d26034fce8677" style="width: 100.0%; height: 100.0%;">2025-05-24 19:49:25<br>Yumurtalık (Adana)<br>M 2.1</div>`)[0];
-                popup_6014baf7ba114a22ea25d397fa375751.setContent(html_246329a474b9c3e5cb5d26034fce8677);
+                var html_2b3d069e99a1ff87e2d6ba9bb19e9adc = $(`<div id="html_2b3d069e99a1ff87e2d6ba9bb19e9adc" style="width: 100.0%; height: 100.0%;">2025-05-24 19:49:25<br>Yumurtalık (Adana)<br>M 2.1</div>`)[0];
+                popup_9f5237f1578205c565812706108fbf75.setContent(html_2b3d069e99a1ff87e2d6ba9bb19e9adc);
             
         
 
-        circle_marker_9ad943ceb9f69ca4b4d813636595e5d4.bindPopup(popup_6014baf7ba114a22ea25d397fa375751)
+        circle_marker_0b492c3cf16c61707db86ca27888e21c.bindPopup(popup_9f5237f1578205c565812706108fbf75)
         ;
 
         
     
     
-            var circle_marker_f8b7e08d51a6c102fde571a15e155d84 = L.circleMarker(
+            var circle_marker_fe4f39c7e66bcee87fb35cd66fd73af7 = L.circleMarker(
                 [38.10667, 27.12139],
                 {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "blue", "fillOpacity": 0.8, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 3}
-            ).addTo(map_b743af90482398c4292c86fa47b05fc3);
+            ).addTo(map_8236b8db11b0fc85567f8eba63f84566);
         
     
-        var popup_4f612d37d52ac5ee7099f166d6083510 = L.popup({
+        var popup_9ae1a151b2556a2beba689d7e307c456 = L.popup({
   "maxWidth": "100%",
 });
 
         
             
-                var html_e93b89cd98b1dab034451f0777b84c2e = $(`<div id="html_e93b89cd98b1dab034451f0777b84c2e" style="width: 100.0%; height: 100.0%;">2025-05-24 20:06:04<br>Menderes (İzmir)<br>M 3.0</div>`)[0];
-                popup_4f612d37d52ac5ee7099f166d6083510.setContent(html_e93b89cd98b1dab034451f0777b84c2e);
+                var html_a82cbab9c7fed45e4441be2ee38fa931 = $(`<div id="html_a82cbab9c7fed45e4441be2ee38fa931" style="width: 100.0%; height: 100.0%;">2025-05-24 20:06:04<br>Menderes (İzmir)<br>M 3.0</div>`)[0];
+                popup_9ae1a151b2556a2beba689d7e307c456.setContent(html_a82cbab9c7fed45e4441be2ee38fa931);
             
         
 
-        circle_marker_f8b7e08d51a6c102fde571a15e155d84.bindPopup(popup_4f612d37d52ac5ee7099f166d6083510)
+        circle_marker_fe4f39c7e66bcee87fb35cd66fd73af7.bindPopup(popup_9ae1a151b2556a2beba689d7e307c456)
         ;
 
         
     
     
-            var circle_marker_1717938cc51661062465c6f95836f8e1 = L.circleMarker(
+            var circle_marker_c7f8e25f78235b6f5dacb1340732b165 = L.circleMarker(
                 [37.66333, 35.96889],
                 {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "blue", "fillOpacity": 0.8, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 3}
-            ).addTo(map_b743af90482398c4292c86fa47b05fc3);
+            ).addTo(map_8236b8db11b0fc85567f8eba63f84566);
         
     
-        var popup_fb9aa6bf9a1371b8a7aad05f1f9496e2 = L.popup({
+        var popup_ba4d3e6af0b427e8095346c4142f94d9 = L.popup({
   "maxWidth": "100%",
 });
 
         
             
-                var html_7771b00624c6cab958e86566b6f3777c = $(`<div id="html_7771b00624c6cab958e86566b6f3777c" style="width: 100.0%; height: 100.0%;">2025-05-24 20:07:31<br>Kozan (Adana)<br>M 2.3</div>`)[0];
-                popup_fb9aa6bf9a1371b8a7aad05f1f9496e2.setContent(html_7771b00624c6cab958e86566b6f3777c);
+                var html_f4ec0aaf01ff4843afd375b8429efa4b = $(`<div id="html_f4ec0aaf01ff4843afd375b8429efa4b" style="width: 100.0%; height: 100.0%;">2025-05-24 20:07:31<br>Kozan (Adana)<br>M 2.3</div>`)[0];
+                popup_ba4d3e6af0b427e8095346c4142f94d9.setContent(html_f4ec0aaf01ff4843afd375b8429efa4b);
             
         
 
-        circle_marker_1717938cc51661062465c6f95836f8e1.bindPopup(popup_fb9aa6bf9a1371b8a7aad05f1f9496e2)
+        circle_marker_c7f8e25f78235b6f5dacb1340732b165.bindPopup(popup_ba4d3e6af0b427e8095346c4142f94d9)
         ;
 
         
     
     
-            var marker_d0e4d1e78a3ec6ff5da594985e28ec22 = L.marker(
-                [39.967042, 32.8593645],
-                {
-}
-            ).addTo(map_b743af90482398c4292c86fa47b05fc3);
+            var circle_marker_6dcfcbe8e53777f4e4cb80a681ab3a51 = L.circleMarker(
+                [38.105, 38.40611],
+                {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "blue", "fillOpacity": 0.8, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 3}
+            ).addTo(map_8236b8db11b0fc85567f8eba63f84566);
         
     
-            var icon_bd5e0fdd33982081d0afa876a3d026dd = L.AwesomeMarkers.icon(
+        var popup_f456da98d6aa02c06923bf92f78f74ba = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_a75e50c0bd28a68cc8ae35adbe22c414 = $(`<div id="html_a75e50c0bd28a68cc8ae35adbe22c414" style="width: 100.0%; height: 100.0%;">2025-05-24 20:01:11<br>Çelikhan (Adıyaman)<br>M 1.6</div>`)[0];
+                popup_f456da98d6aa02c06923bf92f78f74ba.setContent(html_a75e50c0bd28a68cc8ae35adbe22c414);
+            
+        
+
+        circle_marker_6dcfcbe8e53777f4e4cb80a681ab3a51.bindPopup(popup_f456da98d6aa02c06923bf92f78f74ba)
+        ;
+
+        
+    
+    
+            var circle_marker_3db8b5c24e23ca4b3badb501960c108b = L.circleMarker(
+                [39.38333, 27.95833],
+                {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "blue", "fillOpacity": 0.8, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 3}
+            ).addTo(map_8236b8db11b0fc85567f8eba63f84566);
+        
+    
+        var popup_10951b2096ce5e63d4d128276df5b562 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_f116984ca0ce660490d6b9ed41ee5693 = $(`<div id="html_f116984ca0ce660490d6b9ed41ee5693" style="width: 100.0%; height: 100.0%;">2025-05-24 21:06:55<br>Altıeylül (Balıkesir)<br>M 1.1</div>`)[0];
+                popup_10951b2096ce5e63d4d128276df5b562.setContent(html_f116984ca0ce660490d6b9ed41ee5693);
+            
+        
+
+        circle_marker_3db8b5c24e23ca4b3badb501960c108b.bindPopup(popup_10951b2096ce5e63d4d128276df5b562)
+        ;
+
+        
+    
+    
+            var circle_marker_fd52ab8da6bdd5b298edea7386558445 = L.circleMarker(
+                [39.10139, 33.29028],
+                {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "blue", "fillOpacity": 0.8, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 3}
+            ).addTo(map_8236b8db11b0fc85567f8eba63f84566);
+        
+    
+        var popup_f00574691852c005792ead36e064eda8 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_1b087f127381a8210eb916c8d7c6d9fd = $(`<div id="html_1b087f127381a8210eb916c8d7c6d9fd" style="width: 100.0%; height: 100.0%;">2025-05-24 21:12:18<br>Kulu (Konya)<br>M 1.1</div>`)[0];
+                popup_f00574691852c005792ead36e064eda8.setContent(html_1b087f127381a8210eb916c8d7c6d9fd);
+            
+        
+
+        circle_marker_fd52ab8da6bdd5b298edea7386558445.bindPopup(popup_f00574691852c005792ead36e064eda8)
+        ;
+
+        
+    
+    
+            var circle_marker_77f9c57c6a29338aa1e049d11359ff9a = L.circleMarker(
+                [39.81833, 39.81694],
+                {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "blue", "fillOpacity": 0.8, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 3}
+            ).addTo(map_8236b8db11b0fc85567f8eba63f84566);
+        
+    
+        var popup_56440226f559535c2aa9811daf443ad8 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_f79f009c17bf659fd91f7d854a9467ea = $(`<div id="html_f79f009c17bf659fd91f7d854a9467ea" style="width: 100.0%; height: 100.0%;">2025-05-24 21:10:04<br>Çayırlı (Erzincan)<br>M 1.1</div>`)[0];
+                popup_56440226f559535c2aa9811daf443ad8.setContent(html_f79f009c17bf659fd91f7d854a9467ea);
+            
+        
+
+        circle_marker_77f9c57c6a29338aa1e049d11359ff9a.bindPopup(popup_56440226f559535c2aa9811daf443ad8)
+        ;
+
+        
+    
+    
+            var circle_marker_c490b7b9465f5c1bbb22fa291e5a6ac8 = L.circleMarker(
+                [38.09917, 27.12722],
+                {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "blue", "fillOpacity": 0.8, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 3}
+            ).addTo(map_8236b8db11b0fc85567f8eba63f84566);
+        
+    
+        var popup_b585cf7b7240fff6638106affac58c01 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_df7fc6ba2e82c71df8c707d91e9ee174 = $(`<div id="html_df7fc6ba2e82c71df8c707d91e9ee174" style="width: 100.0%; height: 100.0%;">2025-05-24 20:18:58<br>Menderes (İzmir)<br>M 2.1</div>`)[0];
+                popup_b585cf7b7240fff6638106affac58c01.setContent(html_df7fc6ba2e82c71df8c707d91e9ee174);
+            
+        
+
+        circle_marker_c490b7b9465f5c1bbb22fa291e5a6ac8.bindPopup(popup_b585cf7b7240fff6638106affac58c01)
+        ;
+
+        
+    
+    
+            var marker_50e53e7aa78b209d520127743e87ec01 = L.marker(
+                [36.55056, 29.21583],
+                {
+}
+            ).addTo(map_8236b8db11b0fc85567f8eba63f84566);
+        
+    
+            var div_icon_e9f39c1a3df94c2a843bfbf9d31b5051 = L.divIcon({
+  "html": "\u003cdiv class=\"pulse\"\u003e\u003c/div\u003e",
+  "iconSize": [20, 20],
+  "iconAnchor": [10, 10],
+  "className": "empty",
+});
+        
+    
+        var popup_2bf8acdd7cf7775a294b90af1b656d19 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_28633d340e2fd2680ab286c66bd52eef = $(`<div id="html_28633d340e2fd2680ab286c66bd52eef" style="width: 100.0%; height: 100.0%;">2025-05-24 21:46:28<br>Seydikemer (Muğla)<br>M 1.0</div>`)[0];
+                popup_2bf8acdd7cf7775a294b90af1b656d19.setContent(html_28633d340e2fd2680ab286c66bd52eef);
+            
+        
+
+        marker_50e53e7aa78b209d520127743e87ec01.bindPopup(popup_2bf8acdd7cf7775a294b90af1b656d19)
+        ;
+
+        
+    
+    
+                marker_50e53e7aa78b209d520127743e87ec01.setIcon(div_icon_e9f39c1a3df94c2a843bfbf9d31b5051);
+            
+    
+            var marker_cc3069a30c437d0c65999c7343194f54 = L.marker(
+                [36.30056, 36.07944],
+                {
+}
+            ).addTo(map_8236b8db11b0fc85567f8eba63f84566);
+        
+    
+            var div_icon_16fbd747aa3be272e73994d0a3ca0362 = L.divIcon({
+  "html": "\u003cdiv class=\"pulse\"\u003e\u003c/div\u003e",
+  "iconSize": [20, 20],
+  "iconAnchor": [10, 10],
+  "className": "empty",
+});
+        
+    
+        var popup_2d71a9bae698317051e5567cb87a75ed = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_b7cb04f9fff364e6a6aaf19529b7c68b = $(`<div id="html_b7cb04f9fff364e6a6aaf19529b7c68b" style="width: 100.0%; height: 100.0%;">2025-05-24 22:21:27<br>Antakya (Hatay)<br>M 3.3</div>`)[0];
+                popup_2d71a9bae698317051e5567cb87a75ed.setContent(html_b7cb04f9fff364e6a6aaf19529b7c68b);
+            
+        
+
+        marker_cc3069a30c437d0c65999c7343194f54.bindPopup(popup_2d71a9bae698317051e5567cb87a75ed)
+        ;
+
+        
+    
+    
+                marker_cc3069a30c437d0c65999c7343194f54.setIcon(div_icon_16fbd747aa3be272e73994d0a3ca0362);
+            
+    
+            var marker_70d21bf0fb1ae9f02bff2d13c4a7726e = L.marker(
+                [36.30167, 36.05972],
+                {
+}
+            ).addTo(map_8236b8db11b0fc85567f8eba63f84566);
+        
+    
+            var div_icon_3b07fcd0110baa4cdc09ea40668b12bf = L.divIcon({
+  "html": "\u003cdiv class=\"pulse\"\u003e\u003c/div\u003e",
+  "iconSize": [20, 20],
+  "iconAnchor": [10, 10],
+  "className": "empty",
+});
+        
+    
+        var popup_7583fa2269e08e4cbab28cabaee30e19 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_8f9938c3c4057ce7996dca400ba8bad9 = $(`<div id="html_8f9938c3c4057ce7996dca400ba8bad9" style="width: 100.0%; height: 100.0%;">2025-05-24 22:23:16<br>Antakya (Hatay)<br>M 2.0</div>`)[0];
+                popup_7583fa2269e08e4cbab28cabaee30e19.setContent(html_8f9938c3c4057ce7996dca400ba8bad9);
+            
+        
+
+        marker_70d21bf0fb1ae9f02bff2d13c4a7726e.bindPopup(popup_7583fa2269e08e4cbab28cabaee30e19)
+        ;
+
+        
+    
+    
+                marker_70d21bf0fb1ae9f02bff2d13c4a7726e.setIcon(div_icon_3b07fcd0110baa4cdc09ea40668b12bf);
+            
+    
+            var marker_f6ecffeabb4118962cf53e4692090f64 = L.marker(
+                [38.82083, 26.86472],
+                {
+}
+            ).addTo(map_8236b8db11b0fc85567f8eba63f84566);
+        
+    
+            var div_icon_e3d320cd7a7ff8ff51b4f05caf633a49 = L.divIcon({
+  "html": "\u003cdiv class=\"pulse\"\u003e\u003c/div\u003e",
+  "iconSize": [20, 20],
+  "iconAnchor": [10, 10],
+  "className": "empty",
+});
+        
+    
+        var popup_fcce4ee21ba954348ff7926f86c8f6db = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_9ed634ba6549ab1222b426a39a2d4c33 = $(`<div id="html_9ed634ba6549ab1222b426a39a2d4c33" style="width: 100.0%; height: 100.0%;">2025-05-24 22:38:53<br>Ege Denizi - Çandarlı Körfezi - [08.05 km] Foça (İzmir)<br>M 1.0</div>`)[0];
+                popup_fcce4ee21ba954348ff7926f86c8f6db.setContent(html_9ed634ba6549ab1222b426a39a2d4c33);
+            
+        
+
+        marker_f6ecffeabb4118962cf53e4692090f64.bindPopup(popup_fcce4ee21ba954348ff7926f86c8f6db)
+        ;
+
+        
+    
+    
+                marker_f6ecffeabb4118962cf53e4692090f64.setIcon(div_icon_e3d320cd7a7ff8ff51b4f05caf633a49);
+            
+    
+            var marker_daf22cefbf039d7f7a20b30ac93d4ef8 = L.marker(
+                [39.22583, 28.97278],
+                {
+}
+            ).addTo(map_8236b8db11b0fc85567f8eba63f84566);
+        
+    
+            var div_icon_3ec798b1a658147c47e8b131614b935f = L.divIcon({
+  "html": "\u003cdiv class=\"pulse\"\u003e\u003c/div\u003e",
+  "iconSize": [20, 20],
+  "iconAnchor": [10, 10],
+  "className": "empty",
+});
+        
+    
+        var popup_072dcef7ce51813a4bed568379569f24 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_cbf0267e04b8c49e331ae5b47848ab3d = $(`<div id="html_cbf0267e04b8c49e331ae5b47848ab3d" style="width: 100.0%; height: 100.0%;">2025-05-24 22:52:38<br>Simav (Kütahya)<br>M 1.1</div>`)[0];
+                popup_072dcef7ce51813a4bed568379569f24.setContent(html_cbf0267e04b8c49e331ae5b47848ab3d);
+            
+        
+
+        marker_daf22cefbf039d7f7a20b30ac93d4ef8.bindPopup(popup_072dcef7ce51813a4bed568379569f24)
+        ;
+
+        
+    
+    
+                marker_daf22cefbf039d7f7a20b30ac93d4ef8.setIcon(div_icon_3ec798b1a658147c47e8b131614b935f);
+            
+    
+            var marker_f28096f269bf7ddccf7d3a811c04d95b = L.marker(
+                [36.38694, 28.68028],
+                {
+}
+            ).addTo(map_8236b8db11b0fc85567f8eba63f84566);
+        
+    
+            var div_icon_202aadc0c38aa280fb8506a17b480d5d = L.divIcon({
+  "html": "\u003cdiv class=\"pulse\"\u003e\u003c/div\u003e",
+  "iconSize": [20, 20],
+  "iconAnchor": [10, 10],
+  "className": "empty",
+});
+        
+    
+        var popup_e1d005885d23699381681263776f761d = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_0bcd6d9d20a365eb0058180066c1bdd2 = $(`<div id="html_0bcd6d9d20a365eb0058180066c1bdd2" style="width: 100.0%; height: 100.0%;">2025-05-24 22:44:32<br>Akdeniz - [36.43 km] Ortaca (Muğla)<br>M 1.2</div>`)[0];
+                popup_e1d005885d23699381681263776f761d.setContent(html_0bcd6d9d20a365eb0058180066c1bdd2);
+            
+        
+
+        marker_f28096f269bf7ddccf7d3a811c04d95b.bindPopup(popup_e1d005885d23699381681263776f761d)
+        ;
+
+        
+    
+    
+                marker_f28096f269bf7ddccf7d3a811c04d95b.setIcon(div_icon_202aadc0c38aa280fb8506a17b480d5d);
+            
+    
+            var marker_8423b2ebd1b23f29e28bcda4e912cfcf = L.marker(
+                [41.82861, 43.25167],
+                {
+}
+            ).addTo(map_8236b8db11b0fc85567f8eba63f84566);
+        
+    
+            var div_icon_338d71db7a57d5e595575d578e2e5078 = L.divIcon({
+  "html": "\u003cdiv class=\"pulse\"\u003e\u003c/div\u003e",
+  "iconSize": [20, 20],
+  "iconAnchor": [10, 10],
+  "className": "empty",
+});
+        
+    
+        var popup_3b8e9a12f5255ee9e9999fc2e2f69b24 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_d016882b2223cc2e45fe8cd99a1c0ed9 = $(`<div id="html_d016882b2223cc2e45fe8cd99a1c0ed9" style="width: 100.0%; height: 100.0%;">2025-05-24 22:32:32<br>Borjomi, Samtskhe-Javakheti (Gürcistan) - [45.26 km] Posof (Ardahan)<br>M 2.0</div>`)[0];
+                popup_3b8e9a12f5255ee9e9999fc2e2f69b24.setContent(html_d016882b2223cc2e45fe8cd99a1c0ed9);
+            
+        
+
+        marker_8423b2ebd1b23f29e28bcda4e912cfcf.bindPopup(popup_3b8e9a12f5255ee9e9999fc2e2f69b24)
+        ;
+
+        
+    
+    
+                marker_8423b2ebd1b23f29e28bcda4e912cfcf.setIcon(div_icon_338d71db7a57d5e595575d578e2e5078);
+            
+    
+            var marker_6929469a46ba16c5dd8ae268acdd8152 = L.marker(
+                [38.29194, 38.80639],
+                {
+}
+            ).addTo(map_8236b8db11b0fc85567f8eba63f84566);
+        
+    
+            var div_icon_96e6be64af16a39e42c992fdecb65891 = L.divIcon({
+  "html": "\u003cdiv class=\"pulse\"\u003e\u003c/div\u003e",
+  "iconSize": [20, 20],
+  "iconAnchor": [10, 10],
+  "className": "empty",
+});
+        
+    
+        var popup_82cff72f1d3a3170c1592b37a2ae6d15 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_e45b8963ea08d5b7d3fa55090ed04165 = $(`<div id="html_e45b8963ea08d5b7d3fa55090ed04165" style="width: 100.0%; height: 100.0%;">2025-05-24 22:52:43<br>Pütürge (Malatya)<br>M 1.0</div>`)[0];
+                popup_82cff72f1d3a3170c1592b37a2ae6d15.setContent(html_e45b8963ea08d5b7d3fa55090ed04165);
+            
+        
+
+        marker_6929469a46ba16c5dd8ae268acdd8152.bindPopup(popup_82cff72f1d3a3170c1592b37a2ae6d15)
+        ;
+
+        
+    
+    
+                marker_6929469a46ba16c5dd8ae268acdd8152.setIcon(div_icon_96e6be64af16a39e42c992fdecb65891);
+            
+    
+            var marker_8e4c6827f1f9817449ccc2bf00787f8d = L.marker(
+                [39.960576, 32.60416],
+                {
+}
+            ).addTo(map_8236b8db11b0fc85567f8eba63f84566);
+        
+    
+            var icon_94b669c15e0eebe8da53726f10ddfeb2 = L.AwesomeMarkers.icon(
                 {
   "markerColor": "green",
   "iconColor": "white",
@@ -484,24 +907,24 @@
             );
         
     
-        var popup_65a3d578c010c784fba2fe9a9eb0b033 = L.popup({
+        var popup_01c8e70ea621d947e7d309cc5c4bf06e = L.popup({
   "maxWidth": "100%",
 });
 
         
             
-                var html_66735c2f62626d3c8889d7ee73dc89c3 = $(`<div id="html_66735c2f62626d3c8889d7ee73dc89c3" style="width: 100.0%; height: 100.0%;">Seçilen Lokasyon</div>`)[0];
-                popup_65a3d578c010c784fba2fe9a9eb0b033.setContent(html_66735c2f62626d3c8889d7ee73dc89c3);
+                var html_27aabbb659f259d274fae14c65b40f6e = $(`<div id="html_27aabbb659f259d274fae14c65b40f6e" style="width: 100.0%; height: 100.0%;">Seçilen Lokasyon</div>`)[0];
+                popup_01c8e70ea621d947e7d309cc5c4bf06e.setContent(html_27aabbb659f259d274fae14c65b40f6e);
             
         
 
-        marker_d0e4d1e78a3ec6ff5da594985e28ec22.bindPopup(popup_65a3d578c010c784fba2fe9a9eb0b033)
+        marker_8e4c6827f1f9817449ccc2bf00787f8d.bindPopup(popup_01c8e70ea621d947e7d309cc5c4bf06e)
         ;
 
         
     
     
-                marker_d0e4d1e78a3ec6ff5da594985e28ec22.setIcon(icon_bd5e0fdd33982081d0afa876a3d026dd);
+                marker_8e4c6827f1f9817449ccc2bf00787f8d.setIcon(icon_94b669c15e0eebe8da53726f10ddfeb2);
             
 </script>
 </html>
