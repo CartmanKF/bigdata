@@ -236,6 +236,14 @@ def last_realtime_eq():
         return jsonify(last_eq)
     return jsonify({})
 
+@app.route('/last50')
+def last50():
+    # Son 50 depremi hem realtime'dan hem historical'dan çek, tarihe göre sırala
+    all_eq = list(collection.find({}, {"_id": 0})) + list(rt_collection.find({}, {"_id": 0}))
+    all_eq.sort(key=lambda x: x.get("Date"), reverse=True)
+    last50 = all_eq[:50]
+    return render_template("last50.html", earthquakes=last50)
+
 if __name__ == "__main__":
     fetch_thread = threading.Thread(target=fetch_afad_loop, daemon=True)
     fetch_thread.start()
