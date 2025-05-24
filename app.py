@@ -1,27 +1,43 @@
-from flask import Flask, render_template, request, jsonify, session
-from pymongo import MongoClient
-import folium
-from datetime import datetime, timedelta
-from geopy.distance import geodesic
-from folium.features import DivIcon
 import threading
 import time
-import requests
-import pytz
-import base64
-import twitter_api
+from datetime import datetime, timedelta
 
+import folium
+import pytz
+import requests
+from flask import Flask, render_template, request, jsonify, session
+from folium.features import DivIcon
+from geopy.distance import geodesic
+from pymongo import MongoClient
+
+import twitter_api  # Twitter API işlemleri için
 
 app = Flask(__name__)
-app.secret_key = "super-secret-key"  # Session için gerekli
+app.secret_key = "super-secret-key"
 
 client = MongoClient("mongodb+srv://cartmankf:H3Ppd2xIyGDMAVoO@cluster0.gyh12d4.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0")
 db = client["earthquake_db"]
 collection = db["historical_earthquakes"]
 rt_collection = db["realtime_earthquakes"]
+tweets_collection = db["tweets"]
 
 TURKEY = pytz.timezone("Europe/Istanbul")
 fetch_lock = threading.Lock()
+
+
+def parse_date_to_utc(date_obj):
+    if isinstance(date_obj, str):
+        try:
+            date_obj = datetime.strptime(date_obj, "%Y-%m-%d %H:%M:%S")
+            date_obj = pytz.utc.localize(date_obj)
+        except Exception:
+            date_obj = datetime.fromisoformat(date_obj)
+            if date_obj.tzinfo is None:
+                date_obj = pytz.utc.localize(date_obj)
+    elif date_obj.tzinfo is None:
+        date_obj = pytz.utc.localize(date_obj)
+    return date_obj
+
 
 def fetch_afad_loop():
     while True:
@@ -30,17 +46,19 @@ def fetch_afad_loop():
             two_hours_ago_tr = now_tr - timedelta(hours=2)
             now_utc = now_tr.astimezone(pytz.utc)
             two_hours_ago_utc = two_hours_ago_tr.astimezone(pytz.utc)
-            start = two_hours_ago_utc.strftime('%Y-%m-%dT%H:%M:%S')  # Buradaki isim düzeltildi
+            start = two_hours_ago_utc.strftime('%Y-%m-%dT%H:%M:%S')
             end = now_utc.strftime('%Y-%m-%dT%H:%M:%S')
+
             url = f"https://servisnet.afad.gov.tr/apigateway/deprem/apiv2/event/filter?start={start}&end={end}"
-            print(f"[FETCH] Son 2 saatlik: {url}")
+            print(f"[AFAD FETCH] {url}")
 
             try:
                 response = requests.get(url, timeout=15)
+                response.raise_for_status()
                 data = response.json()
             except Exception as e:
-                print("[AFAD] Veri alınamadı:", e)
-                time.sleep(10)
+                print(f"[AFAD ERROR] Veri çekilemedi: {e}")
+                time.sleep(60)
                 continue
 
             if isinstance(data, list):
@@ -48,17 +66,15 @@ def fetch_afad_loop():
             elif isinstance(data, dict) and "result" in data:
                 eq_list = data["result"]
             else:
-                print("Beklenmeyen veri formatı!")
-                time.sleep(10)
+                print("[AFAD ERROR] Beklenmeyen veri formatı")
+                time.sleep(60)
                 continue
 
-            print(f"[INFO] Gelen deprem kaydı sayısı: {len(eq_list)}")
             eklenen = 0
             for eq in eq_list:
                 event_id = eq.get("eventID")
-                location = eq.get("location")
+                location = eq.get("location", "")
                 if not event_id:
-                    print("eventID yok, kayıt atlandı:", location)
                     continue
                 if not rt_collection.find_one({"EventID": event_id}):
                     try:
@@ -75,17 +91,13 @@ def fetch_afad_loop():
                             "Provider": "AFAD"
                         }
                         rt_collection.insert_one(doc)
-                        print(f"[EKLENDİ] {event_id} - {location} - {date_utc}")
                         eklenen += 1
                     except Exception as e:
-                        print(f"[HATA] {event_id} {location}: {e}")
+                        print(f"[AFAD SAVE ERROR] {event_id}: {e}")
                         continue
-                else:
-                    print(f"[ATLADI] {event_id} - {location}")
             if eklenen:
                 print(f"✅ {eklenen} yeni deprem eklendi [{datetime.now(TURKEY)}]")
-        time.sleep(10)
-
+        time.sleep(60)
 
 
 def get_location_from_ip(ip):
@@ -101,37 +113,23 @@ def get_location_from_ip(ip):
         print(f"IP konum alma hatası: {e}")
     return None, None
 
-def parse_date_to_utc(date_obj):
-    if isinstance(date_obj, str):
-        try:
-            date_obj = datetime.strptime(date_obj, "%Y-%m-%d %H:%M:%S")
-            date_obj = pytz.utc.localize(date_obj)
-        except:
-            date_obj = datetime.fromisoformat(date_obj)
-            if date_obj.tzinfo is None:
-                date_obj = pytz.utc.localize(date_obj)
-    elif date_obj.tzinfo is None:
-        date_obj = pytz.utc.localize(date_obj)
-    return date_obj
-
 
 @app.route('/')
 def index():
     turkey_center = (39.0, 35.0)
     now_utc = datetime.now(pytz.utc)
     one_week_ago_utc = now_utc - timedelta(days=7)
+
     results = list(collection.find({"Date": {"$gte": one_week_ago_utc}}, {"_id": 0}))
     results += list(rt_collection.find({"Date": {"$gte": one_week_ago_utc}}, {"_id": 0}))
 
     m = folium.Map(location=turkey_center, zoom_start=6)
-    turkey = TURKEY
     for quake in results:
         try:
             qlat = float(str(quake["Latitude"]).replace(",", "."))
             qlon = float(str(quake["Longitude"]).replace(",", "."))
             date_utc = parse_date_to_utc(quake['Date'])
-
-            date_tr = date_utc.astimezone(turkey)
+            date_tr = date_utc.astimezone(TURKEY)
             tarih_str = date_tr.strftime("%Y-%m-%d %H:%M:%S")
             popup = f"{tarih_str}<br>{quake['Location']}<br>M {quake['Magnitude']}"
             folium.CircleMarker(
@@ -144,15 +142,16 @@ def index():
                 popup=popup
             ).add_to(m)
         except Exception as e:
-            print("Harita hatası:", e)
+            print(f"[MAP ERROR] {e}")
             continue
-
     m.save("templates/map.html")
     return render_template("index.html")
+
 
 @app.route('/interactive_map')
 def interactive_map():
     return render_template("interactive_map.html")
+
 
 @app.route('/filtered_map')
 def filtered_map():
@@ -223,7 +222,6 @@ def filtered_map():
                 qlat = float(str(quake["Latitude"]).replace(",", "."))
                 qlon = float(str(quake["Longitude"]).replace(",", "."))
                 date_utc = parse_date_to_utc(quake['Date'])
-
                 date_tr = date_utc.astimezone(turkey)
                 tarih_str = date_tr.strftime("%Y-%m-%d %H:%M:%S")
 
@@ -258,7 +256,7 @@ def filtered_map():
                         popup=popup
                     ).add_to(m)
             except Exception as e:
-                print("Harita hatası:", e)
+                print(f"[MAP ERROR] {e}")
                 continue
 
         folium.Marker(
@@ -269,20 +267,21 @@ def filtered_map():
 
         m.save("templates/map.html")
         return render_template("map.html")
-
     except Exception as e:
         return f"<h3>Hata oluştu: {e}</h3>"
+
 
 @app.route('/last_realtime_eq')
 def last_realtime_eq():
     last_eq = rt_collection.find_one(sort=[("Date", -1)])
     if last_eq:
-        date_utc = parse_date_to_utc(quake['Date'])
+        date_utc = parse_date_to_utc(last_eq['Date'])
         date_tr = date_utc.astimezone(TURKEY)
         last_eq["Date"] = date_tr.strftime("%Y-%m-%d %H:%M:%S")
         last_eq["_id"] = str(last_eq["_id"])
         return jsonify(last_eq)
     return jsonify({})
+
 
 @app.route('/last50')
 def last50():
@@ -296,7 +295,7 @@ def last50():
             ip = request.remote_addr
 
         if ip in ('127.0.0.1', '::1'):
-            lat, lon = 41.0082, 28.9784  # İstanbul koordinatları
+            lat, lon = 41.0082, 28.9784  # İstanbul koordinatları fallback
         else:
             lat, lon = get_location_from_ip(ip)
 
@@ -323,6 +322,7 @@ def last50():
 
     return render_template("last50.html", earthquakes=last50, near_eq_count=near_eq_count, user_location=(lat, lon))
 
+
 @app.route("/tweets")
 def tweets():
     hashtag = request.args.get("hashtag")
@@ -330,23 +330,29 @@ def tweets():
         return jsonify({"error": "Hashtag parametresi gerekli"}), 400
     token = twitter_api.get_bearer_token()
     tweets = twitter_api.search_tweets(token, hashtag)
-    
-    # Tweetleri MongoDB'ye kaydet
-    twitter_api.save_tweets_to_db(tweets)
+
+    twitter_api.save_tweets_to_db(tweets, tweets_collection)
 
     return jsonify(tweets)
+
 
 def tweetleri_periyodik_kaydet():
     while True:
         try:
             token = twitter_api.get_bearer_token()
-            tweets = twitter_api.search_tweets(token, "deprem" , "türkiye" , "ankara", "istanbul","izmir")
-            twitter_api.save_tweets_to_db(tweets)
+            query = "#deprem (türkiye OR ankara OR istanbul OR izmir)"
+            tweets = twitter_api.search_tweets(token, query)
+            twitter_api.save_tweets_to_db(tweets, tweets_collection)
             print("Tweetler kaydedildi.")
         except Exception as e:
             print(f"Hata: {e}")
-        time.sleep(120)  
+        time.sleep(120)
 
+
+@app.route("/past_tweets")
+def past_tweets():
+    tweets = list(tweets_collection.find({}, {"_id": 0}).sort("created_at", -1).limit(50))
+    return render_template("past_tweets.html", tweets=tweets)
 
 
 @app.route('/nearby_notifications')
@@ -377,9 +383,12 @@ def nearby_notifications():
             })
     return jsonify(nearby_eq)
 
+
 if __name__ == "__main__":
     fetch_thread = threading.Thread(target=fetch_afad_loop, daemon=True)
     fetch_thread.start()
-    print("✅ Flask başlatıldı: http://127.0.0.1:5000")
+
     threading.Thread(target=tweetleri_periyodik_kaydet, daemon=True).start()
+
+    print("✅ Flask başlatıldı: http://127.0.0.1:5000")
     app.run(debug=True)
