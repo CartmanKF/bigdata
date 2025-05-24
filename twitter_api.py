@@ -1,11 +1,15 @@
 import requests
 import base64
-from pymongo import MongoClient
 import time
+from pymongo import MongoClient
 
+API_KEY = "nsdSkWHGEceBeAfJKa7XXSiGP"
+API_SECRET = "B2xAMdxVEMTeTrwSdI4JwgMavXvx1TK0QRoTKWP77o6atrVvBa"
 
-API_KEY = "nsdSkWHGEceBeAfJKa7XXSiGP"  
-API_SECRET = "B2xAMdxVEMTeTrwSdI4JwgMavXvx1TK0QRoTKWP77o6atrVvBa" 
+# MongoDB client ve collection global olarak açılıyor
+client = MongoClient("mongodb+srv://cartmankf:H3Ppd2xIyGDMAVoO@cluster0.gyh12d4.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0")
+db = client["earthquake_db"]
+tweets_collection = db["tweets"]
 
 def get_bearer_token(api_key=API_KEY, api_secret=API_SECRET):
     key_secret = f"{api_key}:{api_secret}".encode('ascii')
@@ -28,7 +32,7 @@ def search_tweets(bearer_token, hashtag, max_results=20, retries=3, delay=5):
     params = {
         "query": query,
         "max_results": max_results,
-        "tweet.fields": "created_at,text"
+        "tweet.fields": "created_at,text,id"
     }
 
     for attempt in range(retries):
@@ -36,7 +40,6 @@ def search_tweets(bearer_token, hashtag, max_results=20, retries=3, delay=5):
             response = requests.get(url, headers=headers, params=params, timeout=15)
             response.raise_for_status()
 
-            # Rate limit kontrolü (isteğe bağlı)
             remaining = response.headers.get("x-rate-limit-remaining")
             reset_time = response.headers.get("x-rate-limit-reset")
             if remaining is not None and int(remaining) == 0:
@@ -53,11 +56,7 @@ def search_tweets(bearer_token, hashtag, max_results=20, retries=3, delay=5):
 
     raise Exception("API isteği başarısız oldu, lütfen daha sonra tekrar deneyin.")
 
-def save_tweets_to_db(tweets):
-    client = MongoClient("mongodb+srv://cartmankf:H3Ppd2xIyGDMAVoO@cluster0.gyh12d4.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0")
-    db = client["earthquake_db"]
-    tweets_collection = db["tweets"]
-
+def save_tweets_to_db(tweets, collection=tweets_collection):
     for tweet in tweets:
-        if not tweets_collection.find_one({"id": tweet["id"]}):
-            tweets_collection.insert_one(tweet)
+        if not collection.find_one({"id": tweet["id"]}):
+            collection.insert_one(tweet)

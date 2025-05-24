@@ -76,10 +76,6 @@
             align-items: flex-end;
             gap: 10px;
         }
-        
-
-
-
 
         /* Buton stil */
         .side-btn {
@@ -133,6 +129,29 @@
         #info-popup ul {
             padding-left: 1.2rem;
         }
+
+        /* Tweet Container Scrollable */
+        #tweetsContainer {
+            margin-top: 10px; 
+            max-width: 400px; 
+            max-height: 400px; 
+            overflow-y: auto; 
+            overflow-x: hidden;
+            background: #fff; 
+            padding: 10px; 
+            border-radius: 10px; 
+            box-shadow: 0 8px 32px rgba(40,70,150,0.12);
+            white-space: normal;
+        }
+        #tweetsContainer > div {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            background: #f9f9f9;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+        }
+
     </style>
 </head>
 <body>
@@ -142,17 +161,21 @@
         <button id="deprem-cantasi-btn" class="side-btn" title="Deprem Çantası İçeriği">
             Deprem Çantası'nda Bulundurmanız Gerekenler
         </button>
-        <button id="info-button" class="side-btn" title="Acil Bilgiler">i</button>
-
+        <button id="info-button" class="side-btn" title="Acil Bilgiler" aria-label="Bilgi">i</button>
+        <a href="{{ url_for('past_tweets') }}" class="side-btn mt-2" style="text-align:center; font-weight: 600;">
+            Geçmiş Tweetleri Görüntüle
+        </a>
     </div>
+
+    <!-- Sağ üst butonlar -->
     <div id="top-right-buttons">
-        <button id="showTweetsBtn" class="side-btn" title="Tweetleri Göster">Tweetleri Göster</button>
-        <div id="tweetsContainer" style="margin-top: 10px; max-width: 400px; max-height: 400px; overflow-y: auto; background: #fff; padding: 10px; border-radius: 10px; box-shadow: 0 8px 32px rgba(40,70,150,0.12);"></div>
+        <button id="showTweetsBtn" class="side-btn" title="Tweetleri Göster">
+            Tweetleri Göster
+        </button>
+        <div id="tweetsContainer"></div>
     </div>
-    
 
-
-    <!-- Deprem Çantası içeriği (açılır kapanır) -->
+    <!-- Deprem Çantası içeriği -->
     <div class="main-card" style="margin-top: 80px;">
         <h1>Deprem Takip Sistemi</h1>
         <div id="deprem-cantasi-content" aria-expanded="false" aria-hidden="true" role="region">
@@ -170,7 +193,6 @@
             </ul>
         </div>
 
-
         <div class="text-center mb-3">
             <button id="showMyEarthquakes" class="btn btn-primary btn-custom">
                 Konumuma Yakın Depremleri Göster
@@ -179,11 +201,9 @@
                 Haritada Ara
             </button>
         </div>
-        <iframe id="mapFrame" class="map-frame" src=""></iframe>
+        <iframe id="mapFrame" class="map-frame" src="" aria-label="Deprem Haritası"></iframe>
         <div id="info-section" class="mt-3 text-center"></div>
     </div>
-
-    
 
     <div class="text-center mt-4">
         <a href="/last50" class="btn btn-dark btn-lg" style="border-radius:1.2rem;">
@@ -254,7 +274,7 @@
         infoPopup.style.display = 'none';
     });
 
-    // Mevcut scriptler - konum ve harita işlemleri (korundu)
+    // Mevcut scriptler - konum ve harita işlemleri
     function showMap(lat, lon) {
         const today = (new Date()).toISOString().slice(0,10);
         document.getElementById("mapFrame").src = `/filtered_map?start_date=${today}&end_date=${today}&lat=${lat}&lon=${lon}&radius=100`;
@@ -292,7 +312,6 @@
     }
 
     window.onload = function() {
-        // Otomatik konum
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(function(position) {
                 const lat = position.coords.latitude;
@@ -320,36 +339,38 @@
     document.getElementById("openInteractiveMap").onclick = function() {
         window.location.href = '/interactive_map';
     };
+
     document.getElementById('showTweetsBtn').addEventListener('click', function() {
-    let hashtag = prompt("Gösterilecek hashtag'i girin (örn: deprem):");
-    if (!hashtag) return Swal.fire("Hashtag gerekli!");
+        let hashtag = prompt("Gösterilecek hashtag'i girin (örn: deprem):");
+        if (!hashtag) return Swal.fire("Hashtag gerekli!");
 
-    fetch(`/tweets?hashtag=${encodeURIComponent(hashtag)}&max_results=10`)
-        .then(response => response.json())
-        .then(data => {
-            const container = document.getElementById('tweetsContainer');
-            container.innerHTML = ''; // Önceki tweetleri temizle
-            if (!data || data.length === 0) {
-                container.innerHTML = "<p>Tweet bulunamadı.</p>";
-                return;
-            }
-            data.forEach(tweet => {
-                const div = document.createElement('div');
-                div.style.border = "1px solid #ccc";
-                div.style.padding = "10px";
-                div.style.marginBottom = "10px";
-                div.style.borderRadius = "8px";
-                div.innerHTML = `<strong>${new Date(tweet.created_at).toLocaleString()}</strong><p>${tweet.text}</p>`;
-                container.appendChild(div);
+        fetch(`/tweets?hashtag=${encodeURIComponent(hashtag)}&max_results=10`)
+            .then(response => response.json())
+            .then(data => {
+                const container = document.getElementById('tweetsContainer');
+                container.innerHTML = '';  // Önceki tweetleri temizle
+                if (!data || data.length === 0) {
+                    container.innerHTML = "<p>Tweet bulunamadı.</p>";
+                    return;
+                }
+                data.forEach(tweet => {
+                    const div = document.createElement('div');
+                    div.style.border = "1px solid #ccc";
+                    div.style.padding = "10px";
+                    div.style.marginBottom = "10px";
+                    div.style.borderRadius = "8px";
+                    div.style.background = "#f9f9f9";
+                    div.style.boxShadow = "0 1px 4px rgba(0,0,0,0.1)";
+                    div.innerHTML = `<strong>${new Date(tweet.created_at).toLocaleString()}</strong><p>${tweet.text}</p>`;
+                    container.appendChild(div);
+                });
+                container.scrollIntoView({behavior: "smooth"});
+            })
+            .catch(err => {
+                Swal.fire("Tweetler alınırken hata oluştu.");
+                console.error(err);
             });
-            container.scrollIntoView({behavior: "smooth"});
-        })
-        .catch(err => {
-            Swal.fire("Tweetler alınırken hata oluştu.");
-            console.error(err);
-        });
-});
-
+    });
 </script>
 
 </body>

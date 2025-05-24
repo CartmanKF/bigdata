@@ -1,7 +1,7 @@
 import threading
 import time
 from datetime import datetime, timedelta
-
+import os
 import folium
 import pytz
 import requests
@@ -9,6 +9,13 @@ from flask import Flask, render_template, request, jsonify, session
 from folium.features import DivIcon
 from geopy.distance import geodesic
 from pymongo import MongoClient
+from gathering_areas.collect import GatheringAreaCollector
+import json
+from emergency_locations import get_all_emergency_points
+from gathering_areas.my_scraper import AFADScraper
+
+
+
 
 import twitter_api  # Twitter API işlemleri için
 
@@ -20,6 +27,7 @@ db = client["earthquake_db"]
 collection = db["historical_earthquakes"]
 rt_collection = db["realtime_earthquakes"]
 tweets_collection = db["tweets"]
+gathering_collection = db["gathering_areas"]
 
 TURKEY = pytz.timezone("Europe/Istanbul")
 fetch_lock = threading.Lock()
@@ -37,6 +45,33 @@ def parse_date_to_utc(date_obj):
     elif date_obj.tzinfo is None:
         date_obj = pytz.utc.localize(date_obj)
     return date_obj
+
+
+
+    
+def save_gathering_areas_to_mongo():
+    folder = "iller"  # collect.py çıktı klasörü
+    for filename in os.listdir(folder):
+        if filename.endswith(".json"):
+            filepath = os.path.join(folder, filename)
+            with open(filepath, "r", encoding="utf-8") as f:
+                data = json.load(f)
+                city = list(data.keys())[0]  # Ör: "Ankara"
+                # Upsert: varsa güncelle, yoksa ekle
+                gathering_collection.update_one(
+                    {"city": city},
+                    {"$set": {"data": data[city]}},
+                    upsert=True
+                )
+    print("Acil toplanma yerleri MongoDB'ye kaydedildi.")
+
+@app.route('/save_gathering_areas')
+def save_gathering_areas():
+    try:
+        save_gathering_areas_to_mongo()
+        return "Veriler MongoDB'ye kaydedildi."
+    except Exception as e:
+        return f"Hata: {e}"
 
 
 def fetch_afad_loop():
@@ -146,6 +181,15 @@ def index():
             continue
     m.save("templates/map.html")
     return render_template("index.html")
+
+@app.route('/collect_gathering_areas')
+def collect_gathering_areas():
+    collector = GatheringAreaCollector()
+    try:
+        collector.run()
+        return "Acil toplanma yerleri başarıyla toplandı ve 'iller/' klasörüne kaydedildi."
+    except Exception as e:
+        return f"Hata oluştu: {e}"
 
 
 @app.route('/interactive_map')
@@ -282,6 +326,23 @@ def last_realtime_eq():
         return jsonify(last_eq)
     return jsonify({})
 
+@app.route('/reverse_geocode')
+def reverse_geocode():
+    lat = request.args.get('lat')
+    lon = request.args.get('lon')
+    if not lat or not lon:
+        return jsonify({'error': 'lat ve lon parametreleri gerekli'}), 400
+
+    try:
+        # OpenStreetMap Nominatim API ile ters geocode örneği
+        url = f'https://nominatim.openstreetmap.org/reverse?format=json&lat={lat}&lon={lon}&zoom=18&addressdetails=1'
+        resp = requests.get(url, headers={'User-Agent': 'YourAppName'})
+        data = resp.json()
+        address = data.get('display_name', '')
+        return jsonify({'location': address})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 
 @app.route('/last50')
 def last50():
@@ -346,13 +407,30 @@ def tweetleri_periyodik_kaydet():
             print("Tweetler kaydedildi.")
         except Exception as e:
             print(f"Hata: {e}")
-        time.sleep(120)
+        time.sleep(60)
 
 
 @app.route("/past_tweets")
 def past_tweets():
     tweets = list(tweets_collection.find({}, {"_id": 0}).sort("created_at", -1).limit(50))
     return render_template("past_tweets.html", tweets=tweets)
+
+@app.route('/nearest_assembly_points')
+def nearest_assembly_points():
+    lat = float(request.args.get('lat'))
+    lon = float(request.args.get('lon'))
+    city = request.args.get('city', default=None)
+
+    points = get_all_emergency_points(city)  # Bu fonksiyon JSON dosyasını okur, aşağıda detay var
+    points_with_distance = []
+    for p in points:
+        if p['lat'] and p['lon']:
+            dist = geodesic((lat, lon), (p['lat'], p['lon'])).km
+            points_with_distance.append((dist, p))
+    points_with_distance.sort(key=lambda x: x[0])
+    nearest = [p for _, p in points_with_distance[:5]]
+
+    return jsonify(nearest)
 
 
 @app.route('/nearby_notifications')
@@ -391,4 +469,5 @@ if __name__ == "__main__":
     threading.Thread(target=tweetleri_periyodik_kaydet, daemon=True).start()
 
     print("✅ Flask başlatıldı: http://127.0.0.1:5000")
+
     app.run(debug=True)
