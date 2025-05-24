@@ -17,10 +17,29 @@
             z-index: 1000;
             display: none;
         }
+        #goHomeBtn {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            z-index: 1001;
+            padding: 8px 16px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 6px;
+        }
+        #goHomeBtn:hover {
+            background-color: #218838;
+        }
     </style>
 </head>
 <body>
     <h3>Haritada bir noktaya tıklayın</h3>
+
+    <button id="goHomeBtn">Ana Sayfaya Dön</button>
+
     <div id="map"></div>
 
     <div id="formPopup">
@@ -58,6 +77,10 @@
             document.getElementById("lon").value = e.latlng.lng;
             document.getElementById("formPopup").style.display = "block";
         });
+
+        document.getElementById("goHomeBtn").onclick = function() {
+            window.location.href = "/";
+        };
     </script>
 
     <!-- Toast Popup ve script -->
