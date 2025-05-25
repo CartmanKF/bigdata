@@ -6,56 +6,71 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"/>
 
     <style>
         body {
-            background: #f4f7fa;
+            background: linear-gradient(135deg, #ffedea 0%, #ffe5d0 100%);
+            min-height: 100vh;
         }
         .main-card {
             margin: 4% auto;
             padding: 2.2rem 2rem 1.5rem 2rem;
-            max-width: 700px;
+            max-width: 750px;
             border-radius: 1.7rem;
-            box-shadow: 0 8px 32px rgba(40,70,150,0.12);
+            box-shadow: 0 8px 32px rgba(255, 87, 34, 0.10);
             background: #fff;
+            border: 2.5px solid #ff7043;
             position: relative;
         }
         h1 {
-            font-size: 2.2rem;
-            font-weight: 700;
-            color: #225d90;
+            font-size: 2.4rem;
+            font-weight: 900;
+            color: #d32f2f;
             text-align:center;
+            letter-spacing: 1px;
+            margin-bottom: 1.2rem;
+        }
+        .main-card h1 i {
+            color: #ff7043;
+            margin-right: 10px;
         }
         .map-frame {
             width: 100%;
             height: 420px;
             border: none;
             border-radius: 1.2rem;
-            box-shadow: 0 1px 8px #bbd;
+            box-shadow: 0 1px 8px #ffab91;
         }
-        .btn-custom {
-            margin: 12px 10px 5px 0;
-            border-radius: 1.3rem;
-            padding: 10px 25px;
-            font-weight: 500;
-            font-size: 1rem;
+        .btn-custom, .side-btn, .btn-primary, .btn-outline-success, .btn-dark {
+            border-radius: 1.3rem !important;
+            font-weight: 600;
+            font-size: 1.08rem;
+            box-shadow: 0 2px 8px rgba(255, 87, 34, 0.13);
+            transition: background 0.2s;
         }
-
-        /* Deprem Çantası içerik */
-        #deprem-cantasi-content {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.5s ease, padding 0.5s ease;
-            background-color: #f8f9fa;
-            padding: 0 15px;
-            border-radius: 5px;
-            margin-top: 10px;
+        .btn-custom, .side-btn {
+            background: linear-gradient(90deg, #ff7043 0%, #ffa726 100%);
+            color: #fff;
+            border: none;
         }
-        #deprem-cantasi-content.open {
-            max-height: 500px;
-            padding: 15px;
+        .btn-custom:hover, .side-btn:hover {
+            background: linear-gradient(90deg, #d84315 0%, #ffb300 100%);
+            color: #fff;
         }
-
+        .btn-outline-success {
+            border: 2px solid #ff7043 !important;
+            color: #ff7043 !important;
+            background: #fff !important;
+        }
+        .btn-outline-success:hover {
+            background: #ff7043 !important;
+            color: #fff !important;
+        }
+        .btn-dark {
+            background: #d32f2f !important;
+            border: none !important;
+        }
         #top-left-buttons {
             position: fixed;
             top: 15px;
@@ -65,7 +80,6 @@
             flex-direction: column;
             gap: 10px;
         }
-
         #top-right-buttons {
             position: fixed;
             top: 15px;
@@ -76,24 +90,16 @@
             align-items: flex-end;
             gap: 10px;
         }
-
-        /* Buton stil */
         .side-btn {
-            background-color: #0d6efd;
-            border: none;
-            color: white;
-            font-weight: 600;
-            border-radius: 1.5rem;
-            padding: 8px 16px;
-            cursor: pointer;
-            font-size: 14px;
-            box-shadow: 0 2px 8px rgba(13, 110, 253, 0.4);
-            user-select: none;
+            padding: 10px 22px;
+            font-size: 1.05rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
-        .side-btn:hover {
-            background-color: #084cd9;
+        .side-btn i {
+            font-size: 1.1rem;
         }
-
         /* Info popup */
         #info-popup {
             display: none;
@@ -102,19 +108,19 @@
             left: 15px;
             z-index: 1200;
             background-color: white;
-            border: 2px solid #0d6efd;
+            border: 2px solid #ff7043;
             border-radius: 8px;
             padding: 15px 20px;
             width: 300px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-            font-size: 0.9rem;
+            box-shadow: 0 4px 15px rgba(255,87,34,0.13);
+            font-size: 0.98rem;
             color: #333;
         }
         #info-popup h5 {
             margin-top: 0;
             margin-bottom: 10px;
             font-weight: 700;
-            color: #0d6efd;
+            color: #d32f2f;
         }
         #info-popup button.close-btn {
             position: absolute;
@@ -124,13 +130,11 @@
             background: transparent;
             font-size: 22px;
             cursor: pointer;
-            color: #0d6efd;
+            color: #ff7043;
         }
         #info-popup ul {
             padding-left: 1.2rem;
         }
-
-        /* Tweet Container Scrollable */
         #tweetsContainer {
             margin-top: 10px; 
             max-width: 400px; 
@@ -140,44 +144,52 @@
             background: #fff; 
             padding: 10px; 
             border-radius: 10px; 
-            box-shadow: 0 8px 32px rgba(40,70,150,0.12);
+            box-shadow: 0 8px 32px rgba(255,87,34,0.10);
             white-space: normal;
         }
         #tweetsContainer > div {
-            border: 1px solid #ccc;
+            border: 1px solid #ffab91;
             padding: 10px;
             margin-bottom: 10px;
             border-radius: 8px;
-            background: #f9f9f9;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+            background: #fff3e0;
+            box-shadow: 0 1px 4px rgba(255,87,34,0.08);
         }
-
+        /* Deprem Çantası içerik */
+        #deprem-cantasi-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s cubic-bezier(0.4,0,0.2,1), padding 0.5s cubic-bezier(0.4,0,0.2,1);
+            background-color: #fff3e0;
+            padding: 0 15px;
+            border-radius: 8px;
+            margin-top: 10px;
+            border: 1.5px solid #ffab91;
+        }
+        #deprem-cantasi-content.open {
+            max-height: 500px;
+            padding: 15px;
+        }
     </style>
 </head>
 <body>
 
     <!-- Sol üst butonlar -->
     <div id="top-left-buttons">
-        <button id="deprem-cantasi-btn" class="side-btn" title="Deprem Çantası İçeriği">
-            Deprem Çantası'nda Bulundurmanız Gerekenler
-        </button>
-        <button id="info-button" class="side-btn" title="Acil Bilgiler" aria-label="Bilgi">i</button>
-        <a href="{{ url_for('past_tweets') }}" class="side-btn mt-2" style="text-align:center; font-weight: 600;">
-            Geçmiş Tweetleri Görüntüle
-        </a>
+        <button id="deprem-cantasi-btn" class="side-btn" title="Deprem Çantası İçeriği"><i class="fa-solid fa-kit-medical"></i> Deprem Çantası'nda Bulundurmanız Gerekenler</button>
+        <button id="info-button" class="side-btn" title="Acil Bilgiler" aria-label="Bilgi"><i class="fa-solid fa-circle-info"></i> Acil Bilgiler</button>
+        <a href="{{ url_for('past_tweets') }}" class="side-btn mt-2" style="text-align:center; font-weight: 600;"><i class="fa-solid fa-clock-rotate-left"></i> Geçmiş Tweetleri Görüntüle</a>
     </div>
 
     <!-- Sağ üst butonlar -->
     <div id="top-right-buttons">
-        <button id="showTweetsBtn" class="side-btn" title="Tweetleri Göster">
-            Tweetleri Göster
-        </button>
+        <button id="showTweetsBtn" class="side-btn" title="Tweetleri Göster"><i class="fa-brands fa-x-twitter"></i> Tweetleri Göster</button>
         <div id="tweetsContainer"></div>
     </div>
 
     <!-- Deprem Çantası içeriği -->
     <div class="main-card" style="margin-top: 80px;">
-        <h1>Deprem Takip Sistemi</h1>
+        <h1><i class="fa-solid fa-earthquake"></i> Deprem Takip Sistemi</h1>
         <div id="deprem-cantasi-content" aria-expanded="false" aria-hidden="true" role="region">
             <ul>
                 <li>Su ve dayanıklı yiyecekler (en az 3 gün yetecek kadar)</li>
@@ -194,21 +206,15 @@
         </div>
 
         <div class="text-center mb-3">
-            <button id="showMyEarthquakes" class="btn btn-primary btn-custom">
-                Konumuma Yakın Depremleri Göster
-            </button>
-            <button id="openInteractiveMap" class="btn btn-outline-success btn-custom">
-                Haritada Ara
-            </button>
+            <button id="showMyEarthquakes" class="btn btn-custom"><i class="fa-solid fa-location-crosshairs"></i> Konumuma Yakın Depremleri Göster</button>
+            <button id="openInteractiveMap" class="btn btn-outline-success"><i class="fa-solid fa-map-location-dot"></i> Haritada Ara</button>
         </div>
         <iframe id="mapFrame" class="map-frame" src="" aria-label="Deprem Haritası"></iframe>
         <div id="info-section" class="mt-3 text-center"></div>
     </div>
 
     <div class="text-center mt-4">
-        <a href="/last50" class="btn btn-dark btn-lg" style="border-radius:1.2rem;">
-            Son 50 Depremi Listele
-        </a>
+        <a href="/last50" class="btn btn-dark btn-lg" style="border-radius:1.2rem;"><i class="fa-solid fa-list"></i> Son 50 Depremi Listele</a>
     </div>
 
     <!-- Acil Bilgi Popup -->
@@ -230,7 +236,6 @@
     // Deprem Çantası aç/kapa animasyonu
     const btnCantasi = document.getElementById('deprem-cantasi-btn');
     const contentCantasi = document.getElementById('deprem-cantasi-content');
-
     btnCantasi.addEventListener('click', () => {
         const isOpen = contentCantasi.classList.toggle('open');
         contentCantasi.setAttribute('aria-expanded', isOpen);
@@ -247,19 +252,21 @@
             infoPopup.style.display = 'none';
         } else {
             infoPopup.style.display = 'block';
-            // Konumu al ve ters geocode yap
+            // Konumu al ve en yakın toplanma alanını göster
             if(navigator.geolocation){
                 navigator.geolocation.getCurrentPosition(pos => {
-                    fetch(`/reverse_geocode?lat=${pos.coords.latitude}&lon=${pos.coords.longitude}`)
+                    fetch(`/nearest_assembly_points?lat=${pos.coords.latitude}&lon=${pos.coords.longitude}`)
                     .then(res => res.json())
                     .then(data => {
-                        if(data.location && data.location.trim() !== "") {
-                            document.getElementById('nearest-assembly-point').textContent = data.location;
+                        if(data && data.length > 0) {
+                            const alan = data[0];
+                            document.getElementById('nearest-assembly-point').textContent =
+                                `${alan.name || ''} - ${alan.address || ''}`;
                         } else {
-                            document.getElementById('nearest-assembly-point').textContent = 'Konum bilgisi alınamadı.';
+                            document.getElementById('nearest-assembly-point').textContent = 'Yakında toplanma alanı bulunamadı.';
                         }
                     }).catch(() => {
-                        document.getElementById('nearest-assembly-point').textContent = 'Konum bilgisi alınamadı.';
+                        document.getElementById('nearest-assembly-point').textContent = 'Yakında toplanma alanı bulunamadı.';
                     });
                 }, () => {
                     document.getElementById('nearest-assembly-point').textContent = 'Konum bilgisi alınamadı.';
@@ -342,33 +349,50 @@
 
     document.getElementById('showTweetsBtn').addEventListener('click', function() {
         let hashtag = prompt("Gösterilecek hashtag'i girin (örn: deprem):");
-        if (!hashtag) return Swal.fire("Hashtag gerekli!");
+        if (!hashtag) return;
 
         fetch(`/tweets?hashtag=${encodeURIComponent(hashtag)}&max_results=10`)
             .then(response => response.json())
             .then(data => {
-                const container = document.getElementById('tweetsContainer');
-                container.innerHTML = '';  // Önceki tweetleri temizle
-                if (!data || data.length === 0) {
-                    container.innerHTML = "<p>Tweet bulunamadı.</p>";
-                    return;
+                let tweetContent = '';
+                if (data.tweets && data.tweets.length > 0) {
+                    data.tweets.forEach(tweet => {
+                        tweetContent += `
+                            <div style="border: 1px solid #ffab91; padding: 10px; margin-bottom: 10px; border-radius: 8px; background: #fff3e0;">
+                                <strong>${new Date(tweet.created_at).toLocaleString()}</strong>
+                                <p>${tweet.text}</p>
+                            </div>
+                        `;
+                    });
+                } else {
+                    tweetContent = '<p>Tweet bulunamadı.</p>';
                 }
-                data.forEach(tweet => {
-                    const div = document.createElement('div');
-                    div.style.border = "1px solid #ccc";
-                    div.style.padding = "10px";
-                    div.style.marginBottom = "10px";
-                    div.style.borderRadius = "8px";
-                    div.style.background = "#f9f9f9";
-                    div.style.boxShadow = "0 1px 4px rgba(0,0,0,0.1)";
-                    div.innerHTML = `<strong>${new Date(tweet.created_at).toLocaleString()}</strong><p>${tweet.text}</p>`;
-                    container.appendChild(div);
+
+                Swal.fire({
+                    title: 'Tweetler',
+                    html: `
+                        <div style="max-height: 400px; overflow-y: auto;">
+                            <p style="color: #ff7043; margin-bottom: 15px;">${data.status}</p>
+                            ${tweetContent}
+                        </div>
+                    `,
+                    width: '600px',
+                    showCloseButton: true,
+                    showConfirmButton: false,
+                    customClass: {
+                        popup: 'tweet-popup'
+                    }
                 });
-                container.scrollIntoView({behavior: "smooth"});
             })
             .catch(err => {
-                Swal.fire("Tweetler alınırken hata oluştu.");
                 console.error(err);
+                Swal.fire({
+                    title: 'Tweetler',
+                    html: '<p>Son kaydedilen tweetler gösteriliyor.</p>',
+                    width: '600px',
+                    showCloseButton: true,
+                    showConfirmButton: false
+                });
             });
     });
 </script>

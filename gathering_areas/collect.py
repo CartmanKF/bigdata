@@ -27,7 +27,7 @@ class GatheringAreaCollector:
     district and neighborhood data retrieval, and saving results to files.
     """
     
-    def __init__(self, cities_file: str = "cities.json", max_workers: int = 10):
+    def __init__(self, cities_file: str = "iller.json", max_workers: int = 10):
         """
         Initialize the collector.
         

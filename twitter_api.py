@@ -3,8 +3,8 @@ import base64
 import time
 from pymongo import MongoClient
 
-API_KEY = "nsdSkWHGEceBeAfJKa7XXSiGP"
-API_SECRET = "B2xAMdxVEMTeTrwSdI4JwgMavXvx1TK0QRoTKWP77o6atrVvBa"
+API_KEY = "2VQKn2bJyYXSN7XRacFggLiQj"
+API_SECRET = "63QOyxcurwKMToTtFIeY8TrnIGVFb9KPZ0R3XQDuUU0qyrTG0L"
 
 # MongoDB client ve collection global olarak açılıyor
 client = MongoClient("mongodb+srv://cartmankf:H3Ppd2xIyGDMAVoO@cluster0.gyh12d4.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0")
@@ -25,7 +25,7 @@ def get_bearer_token(api_key=API_KEY, api_secret=API_SECRET):
     token = response.json().get("access_token")
     return token
 
-def search_tweets(bearer_token, hashtag, max_results=20, retries=3, delay=5):
+def search_tweets(bearer_token, hashtag, max_results=20, retries=1, delay=0):
     url = "https://api.twitter.com/2/tweets/search/recent"
     headers = {"Authorization": f"Bearer {bearer_token}"}
     query = f"#{hashtag} -is:retweet lang:tr"
@@ -39,24 +39,19 @@ def search_tweets(bearer_token, hashtag, max_results=20, retries=3, delay=5):
         try:
             response = requests.get(url, headers=headers, params=params, timeout=15)
             response.raise_for_status()
-
-            remaining = response.headers.get("x-rate-limit-remaining")
-            reset_time = response.headers.get("x-rate-limit-reset")
-            if remaining is not None and int(remaining) == 0:
-                wait_seconds = int(reset_time) - int(time.time())
-                print(f"Rate limit aşıldı, {wait_seconds} saniye bekleniyor...")
-                time.sleep(max(wait_seconds, 0) + 1)
-
             data = response.json()
-            return data.get("data", [])
-
+            tweets = data.get("data", [])
+            print("Çekilen tweetler:", tweets)
+            return tweets
         except requests.exceptions.RequestException as e:
             print(f"API isteği hatası: {e}, {attempt+1}. deneme...")
             time.sleep(delay)
-
     raise Exception("API isteği başarısız oldu, lütfen daha sonra tekrar deneyin.")
 
 def save_tweets_to_db(tweets, collection=tweets_collection):
+    count = 0
     for tweet in tweets:
         if not collection.find_one({"id": tweet["id"]}):
             collection.insert_one(tweet)
+            count += 1
+    print(f"{count} tweet MongoDB'ye kaydedildi.")

@@ -32,6 +32,8 @@ gathering_collection = db["gathering_areas"]
 TURKEY = pytz.timezone("Europe/Istanbul")
 fetch_lock = threading.Lock()
 
+last_twitter_api_call = 0
+TWITTER_API_MIN_INTERVAL = 900  # 15 dakika
 
 def parse_date_to_utc(date_obj):
     if isinstance(date_obj, str):
@@ -50,20 +52,27 @@ def parse_date_to_utc(date_obj):
 
     
 def save_gathering_areas_to_mongo():
-    folder = "iller"  # collect.py çıktı klasörü
-    for filename in os.listdir(folder):
-        if filename.endswith(".json"):
-            filepath = os.path.join(folder, filename)
-            with open(filepath, "r", encoding="utf-8") as f:
-                data = json.load(f)
-                city = list(data.keys())[0]  # Ör: "Ankara"
-                # Upsert: varsa güncelle, yoksa ekle
-                gathering_collection.update_one(
-                    {"city": city},
-                    {"$set": {"data": data[city]}},
-                    upsert=True
-                )
-    print("Acil toplanma yerleri MongoDB'ye kaydedildi.")
+    # Hem kökte hem gathering_areas/iller klasöründe ara
+    possible_folders = ["iller", "gathering_areas/iller"]
+    found = False
+    for folder in possible_folders:
+        if os.path.exists(folder):
+            found = True
+            for filename in os.listdir(folder):
+                if filename.endswith(".json"):
+                    filepath = os.path.join(folder, filename)
+                    with open(filepath, "r", encoding="utf-8") as f:
+                        data = json.load(f)
+                        city = list(data.keys())[0]  # Ör: "Ankara"
+                        gathering_collection.update_one(
+                            {"city": city},
+                            {"$set": {"data": data[city]}},
+                            upsert=True
+                        )
+            print(f"Acil toplanma yerleri MongoDB'ye kaydedildi: {folder}")
+            break
+    if not found:
+        print("HATA: 'iller' klasörü bulunamadı!")
 
 @app.route('/save_gathering_areas')
 def save_gathering_areas():
@@ -184,7 +193,7 @@ def index():
 
 @app.route('/collect_gathering_areas')
 def collect_gathering_areas():
-    collector = GatheringAreaCollector()
+    collector = GatheringAreaCollector(cities_file="iller.json")
     try:
         collector.run()
         return "Acil toplanma yerleri başarıyla toplandı ve 'iller/' klasörüne kaydedildi."
@@ -334,7 +343,6 @@ def reverse_geocode():
         return jsonify({'error': 'lat ve lon parametreleri gerekli'}), 400
 
     try:
-        # OpenStreetMap Nominatim API ile ters geocode örneği
         url = f'https://nominatim.openstreetmap.org/reverse?format=json&lat={lat}&lon={lon}&zoom=18&addressdetails=1'
         resp = requests.get(url, headers={'User-Agent': 'YourAppName'})
         data = resp.json()
@@ -373,6 +381,13 @@ def last50():
     for eq in last50:
         eq_lat = float(str(eq.get("Latitude", 0)).replace(",", "."))
         eq_lon = float(str(eq.get("Longitude", 0)).replace(",", "."))
+        # Date'i Türkiye saatine çevir
+        try:
+            date_utc = parse_date_to_utc(eq["Date"])
+            date_tr = date_utc.astimezone(TURKEY)
+            eq["Date"] = date_tr
+        except Exception:
+            pass
         if lat is not None and lon is not None:
             dist = geodesic((lat, lon), (eq_lat, eq_lon)).km
             eq['near_user'] = dist <= max_distance_km
@@ -386,28 +401,38 @@ def last50():
 
 @app.route("/tweets")
 def tweets():
+    global last_twitter_api_call
     hashtag = request.args.get("hashtag")
     if not hashtag:
-        return jsonify({"error": "Hashtag parametresi gerekli"}), 400
-    token = twitter_api.get_bearer_token()
-    tweets = twitter_api.search_tweets(token, hashtag)
+        return jsonify({"tweets": [], "status": "Hashtag parametresi gerekli"}), 200
 
-    twitter_api.save_tweets_to_db(tweets, tweets_collection)
+    now = time.time()
+    tweets = list(tweets_collection.find({}, {"_id": 0}).sort("created_at", -1).limit(10))
+    status_message = "Son kaydedilen tweetler gösteriliyor."
 
-    return jsonify(tweets)
-
-
-def tweetleri_periyodik_kaydet():
-    while True:
+    if now - last_twitter_api_call >= TWITTER_API_MIN_INTERVAL:
         try:
             token = twitter_api.get_bearer_token()
-            query = "#deprem (türkiye OR ankara OR istanbul OR izmir)"
-            tweets = twitter_api.search_tweets(token, query)
-            twitter_api.save_tweets_to_db(tweets, tweets_collection)
-            print("Tweetler kaydedildi.")
+            new_tweets = twitter_api.search_tweets(token, hashtag)
+            twitter_api.save_tweets_to_db(new_tweets, tweets_collection)
+            last_twitter_api_call = now
+            tweets = new_tweets
+            status_message = f"{len(new_tweets)} yeni tweet çekildi."
         except Exception as e:
-            print(f"Hata: {e}")
-        time.sleep(60)
+            print(f"Tweetler: {e}")
+            status_message ="Son kaydedilen tweetler gösteriliyor."
+
+    try:
+        return jsonify({
+            "tweets": tweets,
+            "status": status_message
+        })
+    except Exception as e:
+        print(f"JSON dönüştürme hatası: {e}")
+        return jsonify({
+            "tweets": [],
+            "status": "Tweetler gösterilirken bir hata oluştu."
+        })
 
 
 @app.route("/past_tweets")
@@ -415,21 +440,36 @@ def past_tweets():
     tweets = list(tweets_collection.find({}, {"_id": 0}).sort("created_at", -1).limit(50))
     return render_template("past_tweets.html", tweets=tweets)
 
+def get_all_emergency_points_from_mongo():
+    all_points = []
+    for city_doc in gathering_collection.find({}):
+        city_data = city_doc.get('data', {})
+        for ilce in city_data.get('ilceler', {}).values():
+            for mahalle in ilce.get('mahalleler', {}).values():
+                for alan in mahalle.get('toplanmaAlanlari', {}).values():
+                    lat = alan.get('lat') or alan.get('latitude') or alan.get('y')
+                    lon = alan.get('lon') or alan.get('longitude') or alan.get('x')
+                    if lat and lon:
+                        all_points.append({
+                            'name': alan.get('ad') or alan.get('tesis_adi', ''),
+                            'lat': float(lat),
+                            'lon': float(lon),
+                            'address': alan.get('adres') or alan.get('acik_adres', ''),
+                            'city': city_doc['city']
+                        })
+    return all_points
+
 @app.route('/nearest_assembly_points')
 def nearest_assembly_points():
     lat = float(request.args.get('lat'))
     lon = float(request.args.get('lon'))
-    city = request.args.get('city', default=None)
-
-    points = get_all_emergency_points(city)  # Bu fonksiyon JSON dosyasını okur, aşağıda detay var
+    all_points = get_all_emergency_points_from_mongo()
     points_with_distance = []
-    for p in points:
-        if p['lat'] and p['lon']:
-            dist = geodesic((lat, lon), (p['lat'], p['lon'])).km
-            points_with_distance.append((dist, p))
+    for p in all_points:
+        dist = geodesic((lat, lon), (p['lat'], p['lon'])).km
+        points_with_distance.append((dist, p))
     points_with_distance.sort(key=lambda x: x[0])
     nearest = [p for _, p in points_with_distance[:5]]
-
     return jsonify(nearest)
 
 
@@ -461,13 +501,21 @@ def nearby_notifications():
             })
     return jsonify(nearby_eq)
 
+@app.route('/fetch_earthquake_tweets')
+def fetch_earthquake_tweets():
+    try:
+        token = twitter_api.get_bearer_token()
+        hashtag = 'deprem (türkiye OR ankara OR istanbul OR izmir)'
+        tweets = twitter_api.search_tweets(token, hashtag, max_results=50)
+        twitter_api.save_tweets_to_db(tweets, tweets_collection)
+        return jsonify({'success': True, 'count': len(tweets)})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
 
 if __name__ == "__main__":
-    fetch_thread = threading.Thread(target=fetch_afad_loop, daemon=True)
-    fetch_thread.start()
-
-    threading.Thread(target=tweetleri_periyodik_kaydet, daemon=True).start()
-
+    # Sadece ana process'te AFAD thread başlat
+    if os.environ.get("WERKZEUG_RUN_MAIN") == "true" or not app.debug:
+        fetch_thread = threading.Thread(target=fetch_afad_loop, daemon=True)
+        fetch_thread.start()
     print("✅ Flask başlatıldı: http://127.0.0.1:5000")
-
     app.run(debug=True)
