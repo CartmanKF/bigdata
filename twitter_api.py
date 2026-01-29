@@ -3,8 +3,8 @@ import base64
 import time
 from pymongo import MongoClient
 
-API_KEY = "2VQKn2bJyYXSN7XRacFggLiQj"
-API_SECRET = "63QOyxcurwKMToTtFIeY8TrnIGVFb9KPZ0R3XQDuUU0qyrTG0L"
+API_KEY = " "
+API_SECRET = " "
 
 # MongoDB client ve collection global olarak açılıyor
 client = MongoClient("mongodb+srv://cartmankf:H3Ppd2xIyGDMAVoO@cluster0.gyh12d4.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0")
